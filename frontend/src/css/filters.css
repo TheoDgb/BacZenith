@@ -1,0 +1,17 @@
+.form-control {
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.42857;
+    box-sizing: border-box;
+    appearance: none;
+}
+
+.form-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
