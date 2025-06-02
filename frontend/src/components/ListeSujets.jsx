@@ -126,23 +126,17 @@ function ListeSujets() {
                             <strong>{sujet.annee} - {sujet.matiere}</strong>
                         </Link>
                         <br />
-                        Série : {sujet.serie} — Spécialité : {sujet.specialite || 'N/A'}
+                        Série : {sujet.serie} – Spécialité : {sujet.specialite || 'N/A'}
                         <br />
                         Épreuve : {sujet.epreuve}
                         <br />
-                        Session : {sujet.session}
-                        <br />
-                        {sujet.num_sujet ? (
-                            <>{sujet.num_sujet}</>
-                        ) : (
-                            <br />
-                        )}
+                        <span>
+                            Session : {sujet.session} {sujet.num_sujet && ` – ${sujet.num_sujet}`}
+                        </span>
                         <hr />
                     </li>
                 ))}
             </ul>
-
-
 
             <div style={{ marginTop: '1rem' }}>
                 <button

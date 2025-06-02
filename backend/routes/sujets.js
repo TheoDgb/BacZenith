@@ -144,4 +144,60 @@ router.post('/', upload.fields([
     }
 });
 
+// DELETE /api/sujets/:id
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await pool.query('DELETE FROM sujets WHERE id = $1', [id]);
+        res.status(200).json({ message: 'Sujet supprimé avec succès.' });
+    } catch (err) {
+        console.error('Erreur suppression sujet :', err.message);
+        res.status(500).send('Erreur serveur');
+    }
+});
+
+router.put('/:id', upload.fields([
+    { name: 'fichier_sujet', maxCount: 1 },
+    { name: 'fichier_corrige', maxCount: 1 }
+]), async (req, res) => {
+    const { id } = req.params;
+    const {
+        annee, serie, matiere, specialite,
+        epreuve, session, num_sujet
+    } = req.body;
+
+    const fichier_sujet = req.files?.fichier_sujet?.[0]?.filename;
+    const fichier_corrige = req.files?.fichier_corrige?.[0]?.filename;
+
+    const fields = [
+        { name: 'annee', value: annee },
+        { name: 'serie', value: serie },
+        { name: 'matiere', value: matiere },
+        { name: 'specialite', value: specialite },
+        { name: 'epreuve', value: epreuve },
+        { name: 'session', value: session },
+        { name: 'num_sujet', value: num_sujet },
+        ...(fichier_sujet ? [{ name: 'fichier_sujet', value: fichier_sujet }] : []),
+        ...(fichier_corrige ? [{ name: 'fichier_corrige', value: fichier_corrige }] : [])
+    ];
+
+    const updates = fields
+        .map((f, idx) => `${f.name} = $${idx + 1}`)
+        .join(', ');
+
+    const values = fields.map(f => f.value);
+
+    try {
+        await pool.query(
+            `UPDATE sujets SET ${updates} WHERE id = $${values.length + 1}`,
+            [...values, id]
+        );
+        res.status(200).json({ message: 'Sujet modifié avec succès' });
+    } catch (err) {
+        console.error('Erreur modification :', err.message);
+        res.status(500).send('Erreur serveur');
+    }
+});
+
+
 module.exports = router;

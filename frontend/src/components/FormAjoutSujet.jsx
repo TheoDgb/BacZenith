@@ -83,12 +83,13 @@ function FormAjoutSujet({ onAjout, onClose }) {
                 </select>
             </div>
             <br />
-                <p>Fichier sujet PDF : <input type="file" name="fichier_sujet" accept="application/pdf" onChange={handleChange} /></p>
-
-                <p>Fichier corrigé PDF : <input type="file" name="fichier_corrige" accept="application/pdf" onChange={handleChange} /></p>
+            <p>Fichier sujet PDF : <input type="file" name="fichier_sujet" accept="application/pdf" onChange={handleChange} /></p>
+            <p>Fichier corrigé PDF : <input type="file" name="fichier_corrige" accept="application/pdf" onChange={handleChange} /></p>
             <br />
-            <button type="submit">Ajouter</button>
-            <button type="button" onClick={onClose}>Annuler</button>
+            <div className="form-container">
+                <button type="submit">Ajouter</button>
+                <button type="button" onClick={onClose}>Annuler</button>
+            </div>
         </form>
     );
 }
