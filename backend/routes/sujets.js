@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middlewares/upload');
 const pool = require('../config');
+const { auth, authorizeRoles } = require('../middlewares/auth');
+const upload = require('../middlewares/upload');
 
 // GET /api/sujets avec filtres
 router.get('/', async (req, res) => {
@@ -108,7 +109,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.post('/', upload.fields([
+router.post('/', auth, authorizeRoles('admin'),
+    upload.fields([
     { name: 'fichier_sujet', maxCount: 1 },
     { name: 'fichier_corrige', maxCount: 1 }
 ]), async (req, res) => {
@@ -145,7 +147,7 @@ router.post('/', upload.fields([
 });
 
 // DELETE /api/sujets/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, authorizeRoles('admin'), async (req, res) => {
     const { id } = req.params;
     try {
         await pool.query('DELETE FROM sujets WHERE id = $1', [id]);
@@ -156,7 +158,8 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', upload.fields([
+// PUT /api/sujets/:id
+router.put('/:id', auth, authorizeRoles('admin'), upload.fields([
     { name: 'fichier_sujet', maxCount: 1 },
     { name: 'fichier_corrige', maxCount: 1 }
 ]), async (req, res) => {

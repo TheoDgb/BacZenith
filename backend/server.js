@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config');
 const sujetsRoutes = require('./routes/sujets');
+const authRoutes = require('./routes/auth');
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(cors()); // autorise les requêtes depuis le frontend
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/sujets', sujetsRoutes);
 
 // Test de serveur
