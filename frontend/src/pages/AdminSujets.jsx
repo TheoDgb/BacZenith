@@ -29,7 +29,7 @@ function AdminSujets() {
 
     const fetchSujets = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/sujets', {
+            const res = await axios.get('/api/sujets', {
                 params: { ...filters, page, limit }
             });
             setSujets(res.data.sujets || []);
@@ -41,7 +41,7 @@ function AdminSujets() {
 
     const fetchOptions = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/sujets/options');
+            const res = await axios.get('/api/sujets/options');
             setOptions(res.data);
         } catch (err) {
             console.error('Erreur chargement options :', err);
@@ -144,7 +144,7 @@ function AdminSujets() {
                                     <button
                                         onClick={() => {
                                             if (window.confirm('Confirmer la suppression ?')) {
-                                                axios.delete(`http://localhost:5000/api/sujets/${s.id}`)
+                                                axios.delete(`/api/sujets/${s.id}`)
                                                     .then(() => {
                                                         alert('Sujet supprimé');
                                                         fetchSujets();

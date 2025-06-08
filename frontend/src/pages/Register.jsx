@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -27,37 +27,24 @@ export default function Register() {
         <div>
             <h2>Créer un compte</h2>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required />
+                <div className="form-container">
+                    <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="form-control" required />
+                    <br />
+                    <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="form-control" required />
+                    <br />
+                    <input type="text" placeholder="Nom" value={nom} onChange={e => setNom(e.target.value)} className="form-control" required />
+                    <br />
+                    <input type="text" placeholder="Prénom" value={prenom} onChange={e => setPrenom(e.target.value)} className="form-control" required />
+                </div>
                 <br />
-                <input
-                    type="password"
-                    placeholder="Mot de passe"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required />
-                <br />
-                <input
-                    type="text"
-                    placeholder="Nom"
-                    value={nom}
-                    onChange={e => setNom(e.target.value)}
-                    required />
-                <br />
-                <input
-                    type="text"
-                    placeholder="Prénom"
-                    value={prenom}
-                    onChange={e => setPrenom(e.target.value)}
-                    required />
-                <br />
-                <button type="submit">S'inscrire</button>
+                <div className="form-container">
+                    <button type="submit">S'inscrire</button>
+                </div>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}
+            <p>
+                Vous êtes tuteur ? <Link to="/devenir-tuteur">Candidater comme tuteur</Link>
+            </p>
         </div>
     );
 }

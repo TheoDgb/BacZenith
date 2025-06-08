@@ -35,7 +35,7 @@ function FormAjoutSujet({ onAjout, onClose }) {
         });
 
         try {
-            await axios.post('http://localhost:5000/api/sujets', data);
+            await axios.post('/api/sujets', data);
             alert('Sujet ajouté');
             onAjout(); // actualise la liste
             onClose(); // ferme le formulaire

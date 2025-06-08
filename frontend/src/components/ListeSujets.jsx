@@ -36,7 +36,7 @@ function ListeSujets() {
 
     const fetchSujets = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/sujets', {
+            const res = await axios.get('/api/sujets', {
                 params: { ...filters, page, limit }
             });
             setSujets(res.data.sujets);
@@ -58,7 +58,7 @@ function ListeSujets() {
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/sujets/options');
+                const res = await axios.get('/api/sujets/options');
                 setOptions(res.data);
             } catch (err) {
                 console.error('Erreur chargement options :', err);

@@ -1,7 +1,7 @@
 import { Link, Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './context/AuthContext.jsx';
-
+import DevenirTuteur from './pages/DevenirTuteur.jsx';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ListeSujets from './components/ListeSujets';
@@ -42,10 +42,12 @@ function App() {
             </nav>
             <Routes>
                 {/* Routes publiques */}
+                <Route path="/devenir-tuteur" element={<DevenirTuteur />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<ListeSujets />} />
                 <Route path="/sujets/:id" element={<SujetDetail />} />
+
 
                 {/* Route protégée (admin uniquement) */}
                 <Route
