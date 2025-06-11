@@ -4,6 +4,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
 const pool = require('../config');
+const { auth, authorizeRoles } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -114,5 +115,99 @@ router.post('/', uploadFields, async (req, res) => {
         res.status(500).json({ error: "Erreur serveur" });
     }
 });
+
+router.get('/all', auth, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                c.id, c.nom, c.prenom, c.email, c.motivation,
+
+                (SELECT array_agg(matiere)
+                 FROM candidature_matieres cm
+                 WHERE cm.candidature_id = c.id) AS matieres,
+
+                (SELECT json_agg(json_build_object('type', dc.type_doc, 'filename', dc.filename))
+                 FROM documents_candidats dc
+                 WHERE dc.candidature_id = c.id) AS documents
+
+            FROM candidatures c
+            ORDER BY c.id DESC
+        `);
+
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const sendMail = require('../utils/sendMail'); // crée ce module avec nodemailer
+
+router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const id = req.params.id;
+
+        // Récupérer la candidature
+        const { rows } = await pool.query('SELECT * FROM candidatures WHERE id = $1', [id]);
+        const candidat = rows[0];
+        if (!candidat) return res.status(404).json({ error: 'Candidature non trouvée' });
+
+        // Générer mot de passe
+        const plainPassword = crypto.randomBytes(6).toString('hex');
+        const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+        // Créer le compte tuteur
+        await pool.query(
+            `INSERT INTO users (nom, prenom, email, password, role)
+             VALUES ($1, $2, $3, $4, 'tuteur')`,
+            [candidat.nom, candidat.prenom, candidat.email, hashedPassword]
+        );
+
+        // Supprimer les fichiers
+        const files = await pool.query('SELECT filename FROM documents_candidats WHERE candidature_id = $1', [id]);
+        files.rows.forEach(({ filename }) => {
+            const fs = require('fs');
+            const path = `./uploads/candidatures/${filename}`;
+            fs.unlink(path, err => {
+                if (err) console.warn(`Erreur suppression fichier ${filename} :`, err.message);
+            });
+        });
+
+        // Supprimer les lignes liées
+        await pool.query('DELETE FROM documents_candidats WHERE candidature_id = $1', [id]);
+        await pool.query('DELETE FROM candidature_matieres WHERE candidature_id = $1', [id]);
+        await pool.query('DELETE FROM candidatures WHERE id = $1', [id]);
+
+        // Envoyer mail
+        await sendMail({
+            to: candidat.email,
+            subject: 'Votre candidature BacZénith a été acceptée',
+            html: `
+                <p>Bonjour ${candidat.prenom},</p>
+                <p>Nous avons le plaisir de vous informer que votre candidature en tant que tuteur a été acceptée.</p>
+                <p>Vous pouvez désormais vous connecter avec les identifiants suivants :</p>
+                <ul>
+                    <li><strong>Email :</strong> ${candidat.email}</li>
+                    <li><strong>Mot de passe :</strong> ${plainPassword}</li>
+                </ul>
+                <p>Vos documents (CV, diplôme, certificats) ont été supprimés de nos serveurs conformément à notre politique de confidentialité.</p>
+                <p>Bienvenue dans l’équipe BacZénith !</p>
+            `
+        });
+
+        res.json({ message: 'Candidat accepté, compte créé et mail envoyé.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erreur lors de l’acceptation' });
+    } finally {
+        client.release();
+    }
+});
+
+
+
 
 module.exports = router;

@@ -25,7 +25,7 @@ export default function Register() {
 
     return (
         <div>
-            <h2>Créer un compte</h2>
+            <h2>Créer un compte élève</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-container">
                     <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="form-control" required />

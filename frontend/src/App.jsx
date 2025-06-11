@@ -6,7 +6,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ListeSujets from './components/ListeSujets';
 import SujetDetail from './components/SujetDetail';
+import AdminAccueil from './pages/AdminAccueil.jsx';
 import AdminSujets from './pages/AdminSujets.jsx';
+import AdminCandidatures from './pages/AdminCandidatures.jsx';
 
 function PrivateRoute({ children, allowedRoles }) {
     const { user, loading } = useContext(AuthContext);
@@ -31,7 +33,7 @@ function App() {
                 {!user ? (
                     <>
                         <Link to="/login">Connexion</Link> |{' '}
-                        <Link to="/register">Créer un compte</Link>
+                        <Link to="/register">Créer un compte élève</Link>
                     </>
                 ) : (
                     <>
@@ -51,10 +53,26 @@ function App() {
 
                 {/* Route protégée (admin uniquement) */}
                 <Route
+                    path="/admin"
+                    element={
+                        <PrivateRoute allowedRoles={['admin']}>
+                            <AdminAccueil />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
                     path="/admin/sujets"
                     element={
                         <PrivateRoute allowedRoles={['admin']}>
                             <AdminSujets />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/admin/candidatures"
+                    element={
+                        <PrivateRoute allowedRoles={['admin']}>
+                            <AdminCandidatures />
                         </PrivateRoute>
                     }
                 />
