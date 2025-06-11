@@ -166,20 +166,14 @@ router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => 
             [candidat.nom, candidat.prenom, candidat.email, hashedPassword]
         );
 
-        // Supprimer les fichiers
-        const files = await pool.query('SELECT filename FROM documents_candidats WHERE candidature_id = $1', [id]);
-        files.rows.forEach(({ filename }) => {
-            const fs = require('fs');
-            const path = `./uploads/candidatures/${filename}`;
-            fs.unlink(path, err => {
-                if (err) console.warn(`Erreur suppression fichier ${filename} :`, err.message);
-            });
-        });
-
         // Supprimer les lignes liées
         await pool.query('DELETE FROM documents_candidats WHERE candidature_id = $1', [id]);
         await pool.query('DELETE FROM candidature_matieres WHERE candidature_id = $1', [id]);
         await pool.query('DELETE FROM candidatures WHERE id = $1', [id]);
+
+        // Supprimer le dossier entier du candidat
+        const dirToRemove = path.join(__dirname, '../uploads/candidatures', id.toString());
+        await fsp.rm(dirToRemove, { recursive: true, force: true });
 
         // Envoyer mail
         await sendMail({
@@ -206,8 +200,6 @@ router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => 
         client.release();
     }
 });
-
-
 
 
 module.exports = router;

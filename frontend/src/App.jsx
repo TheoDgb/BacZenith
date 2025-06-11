@@ -33,7 +33,7 @@ function App() {
                 {!user ? (
                     <>
                         <Link to="/login">Connexion</Link> |{' '}
-                        <Link to="/register">Créer un compte élève</Link>
+                        <Link to="/register">Créer un compte</Link>
                     </>
                 ) : (
                     <>
