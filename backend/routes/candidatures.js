@@ -201,5 +201,45 @@ router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => 
     }
 });
 
+router.post('/:id/refuser', auth, authorizeRoles('admin'), async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const id = req.params.id;
+
+        // Récupérer la candidature
+        const { rows } = await pool.query('SELECT * FROM candidatures WHERE id = $1', [id]);
+        const candidat = rows[0];
+        if (!candidat) return res.status(404).json({ error: 'Candidature non trouvée' });
+
+        // Supprimer les lignes liées
+        await pool.query('DELETE FROM documents_candidats WHERE candidature_id = $1', [id]);
+        await pool.query('DELETE FROM candidature_matieres WHERE candidature_id = $1', [id]);
+        await pool.query('DELETE FROM candidatures WHERE id = $1', [id]);
+
+        // Supprimer le dossier entier du candidat
+        const dirToRemove = path.join(__dirname, '../uploads/candidatures', id.toString());
+        await fsp.rm(dirToRemove, { recursive: true, force: true });
+
+        // Envoyer mail de refus
+        await sendMail({
+            to: candidat.email,
+            subject: 'Votre candidature BacZénith a été refusée',
+            html: `
+                <p>Bonjour ${candidat.prenom},</p>
+                <p>Nous sommes au regret de vous informer que votre candidature en tant que tuteur a été refusée.</p>
+                <p>Nous vous remercions de l'intérêt porté à BacZénith et vous souhaitons bonne continuation dans vos projets.</p>
+            `
+        });
+
+        res.json({ message: 'Candidat refusé, candidature supprimée et mail envoyé.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erreur lors du refus' });
+    } finally {
+        client.release();
+    }
+});
+
+
 
 module.exports = router;

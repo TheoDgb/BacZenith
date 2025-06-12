@@ -29,6 +29,19 @@ export default function AdminCandidatures() {
         }
     };
 
+    const handleRefuser = async (id) => {
+        if (!window.confirm('Refuser cette candidature ? Cette action est définitive.')) return;
+
+        try {
+            await axios.post(`/api/candidatures/${id}/refuser`);
+            alert('Candidat refusé, mail envoyé.');
+            fetchCandidatures(); // rafraîchir la liste
+        } catch (err) {
+            console.error(err);
+            alert("Erreur lors du refus");
+        }
+    };
+
     if (loading) return <p>Chargement des candidatures...</p>;
 
     return (
@@ -54,6 +67,7 @@ export default function AdminCandidatures() {
                                 </ul>
                             </div>
                             <button onClick={() => handleAccepter(c.id)}>Accepter</button>
+                            <button onClick={() => handleRefuser(c.id)}>Refuser</button>
                         </li>
                     ))}
                 </ul>
