@@ -42,6 +42,23 @@ export default function AdminCandidatures() {
         }
     };
 
+    const handleVoirFichier = async (id, type, filename) => {
+        try {
+            const res = await axios.get(`/api/candidatures/fichier/${id}/${type}/${filename}`, {
+                responseType: 'blob',
+                withCredentials: true
+            });
+
+            const blob = new Blob([res.data], { type: res.headers['content-type'] });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (err) {
+            console.error('Erreur lors de la récupération du fichier', err);
+            alert('Impossible d’ouvrir le fichier (non autorisé ou introuvable).');
+        }
+    };
+
+
     if (loading) return <p>Chargement des candidatures...</p>;
 
     return (
@@ -54,14 +71,14 @@ export default function AdminCandidatures() {
                     {candidatures.map(c => (
                         <li key={c.id} style={{ border: '1px solid #ccc', padding: '1em', marginBottom: '1em' }}>
                             <strong>{c.prenom} {c.nom}</strong> - {c.email}
-                            <p><em>Motivation :</em> {c.motivation}</p>
-                            <p><em>Matières :</em> {c.matieres.join(', ')}</p>
+                            <p><strong>Motivation :</strong> {c.motivation}</p>
+                            <p><strong>Matières : </strong>{c.matieres.join(', ')}</p>
                             <div>
                                 <strong>Fichiers :</strong>
                                 <ul>
                                     {c.documents.map((doc, i) => (
                                         <li key={i}>
-                                            {doc.type} : <a href={`/uploads/candidatures/${doc.filename}`} target="_blank" rel="noreferrer">Voir</a>
+                                            {doc.type} : <a href="#" onClick={(e) => {e.preventDefault(); handleVoirFichier(c.id, doc.type, doc.filename.split('/').pop());}}>Voir</a>
                                         </li>
                                     ))}
                                 </ul>

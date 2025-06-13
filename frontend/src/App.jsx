@@ -37,7 +37,12 @@ function App() {
                     </>
                 ) : (
                     <>
-                        <span>Bienvenue {user.prenom} {user.nom} ({user.role})</span> |{' '}
+                        {user.role === 'admin' && (
+                            <>
+                                <Link to="/admin">Admin</Link> |{' '}
+                            </>
+                        )}
+                        <span>Connecté: {user.prenom} {user.nom} ({user.role})</span> |{' '}
                         <button onClick={logout}>Déconnexion</button>
                     </>
                 )}

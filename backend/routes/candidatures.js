@@ -227,6 +227,7 @@ router.post('/:id/refuser', auth, authorizeRoles('admin'), async (req, res) => {
             html: `
                 <p>Bonjour ${candidat.prenom},</p>
                 <p>Nous sommes au regret de vous informer que votre candidature en tant que tuteur a été refusée.</p>
+                <p>Vos documents (CV, diplôme, certificats) ont été supprimés de nos serveurs conformément à notre politique de confidentialité.</p>
                 <p>Nous vous remercions de l'intérêt porté à BacZénith et vous souhaitons bonne continuation dans vos projets.</p>
             `
         });
@@ -238,6 +239,17 @@ router.post('/:id/refuser', auth, authorizeRoles('admin'), async (req, res) => {
     } finally {
         client.release();
     }
+});
+
+router.get('/fichier/:id/:type/:filename', auth, authorizeRoles('admin'), (req, res) => {
+    const { id, type, filename } = req.params;
+    const filePath = path.join(__dirname, '../uploads/candidatures', id, type, filename);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('Fichier introuvable');
+    }
+
+    res.sendFile(filePath);
 });
 
 
