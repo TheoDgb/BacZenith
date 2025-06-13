@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../config');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret123'; // stocke ça dans un .env
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // REGISTER
 router.post('/register', async (req, res) => {
