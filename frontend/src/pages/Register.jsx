@@ -29,11 +29,8 @@ export default function Register() {
             <form onSubmit={handleSubmit}>
                 <div className="form-container">
                     <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="form-control" required />
-                    <br />
                     <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="form-control" required />
-                    <br />
                     <input type="text" placeholder="Nom" value={nom} onChange={e => setNom(e.target.value)} className="form-control" required />
-                    <br />
                     <input type="text" placeholder="Prénom" value={prenom} onChange={e => setPrenom(e.target.value)} className="form-control" required />
                 </div>
                 <br />
@@ -42,9 +39,7 @@ export default function Register() {
                 </div>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <p>
-                Vous êtes tuteur ? <Link to="/devenir-tuteur">Candidater comme tuteur</Link>
-            </p>
+            <p>Vous êtes tuteur ? <Link to="/devenir-tuteur">Candidater comme tuteur</Link></p>
         </div>
     );
 }

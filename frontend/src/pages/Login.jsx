@@ -32,7 +32,6 @@ export default function Login() {
                         onChange={e => setEmail(e.target.value)}
                         className="form-control"
                         required />
-                    <br />
                     <input
                         type="password"
                         placeholder="Mot de passe"
