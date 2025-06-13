@@ -187,6 +187,7 @@ router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => 
                     <li><strong>Email :</strong> ${candidat.email}</li>
                     <li><strong>Mot de passe :</strong> ${plainPassword}</li>
                 </ul>
+                <p>Une fois connecté(e), il vous sera possible de modifier votre mot de passe depuis votre profil.</p>
                 <p>Vos documents (CV, diplôme, certificats) ont été supprimés de nos serveurs conformément à notre politique de confidentialité.</p>
                 <p>Bienvenue dans l’équipe BacZénith !</p>
             `

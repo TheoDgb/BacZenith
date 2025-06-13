@@ -3,6 +3,7 @@ const cors = require('cors');
 const pool = require('./config');
 const candidaturesRoutes = require('./routes/candidatures');
 const authRoutes = require('./routes/auth');
+const profilsRoutes = require('./routes/profils');
 const sujetsRoutes = require('./routes/sujets');
 require('dotenv').config();
 const sendMail = require('./utils/sendMail');
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/api/candidatures', candidaturesRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/profils', profilsRoutes);
 app.use('/api/sujets', sujetsRoutes);
 
 // Test de serveur

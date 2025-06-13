@@ -9,6 +9,7 @@ import SujetDetail from './components/SujetDetail';
 import AdminAccueil from './pages/AdminAccueil.jsx';
 import AdminSujets from './pages/AdminSujets.jsx';
 import AdminCandidatures from './pages/AdminCandidatures.jsx';
+import Profil from "./pages/Profil.jsx";
 
 function PrivateRoute({ children, allowedRoles }) {
     const { user, loading } = useContext(AuthContext);
@@ -37,6 +38,16 @@ function App() {
                     </>
                 ) : (
                     <>
+                        {user.role === 'eleve' && (
+                            <>
+                                <Link to="/profils">Profil élève</Link> |{' '}
+                            </>
+                        )}
+                        {user.role === 'tuteur' && (
+                            <>
+                                <Link to="/profils">Profil tuteur</Link> |{' '}
+                            </>
+                        )}
                         {user.role === 'admin' && (
                             <>
                                 <Link to="/admin">Admin</Link> |{' '}
@@ -55,6 +66,15 @@ function App() {
                 <Route path="/" element={<ListeSujets />} />
                 <Route path="/sujets/:id" element={<SujetDetail />} />
 
+                {/*Routes users*/}
+                <Route
+                    path="/profils"
+                    element={
+                        <PrivateRoute allowedRoles={['eleve', 'tuteur', 'admin']}>
+                            <Profil />
+                        </PrivateRoute>
+                    }
+                />
 
                 {/* Route protégée (admin uniquement) */}
                 <Route

@@ -58,7 +58,6 @@ export default function AdminCandidatures() {
         }
     };
 
-
     if (loading) return <p>Chargement des candidatures...</p>;
 
     return (
