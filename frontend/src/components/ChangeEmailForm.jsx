@@ -14,6 +14,7 @@ function ChangeEmailForm() {
         try {
             const res = await axios.put(`/api/profils/${user.id}/email`, form);
             setMessage('Email mis à jour');
+            setForm({ oldEmail: '', newEmail: '' });
         } catch (err) {
             setMessage(err.response?.data?.error || 'Erreur lors de la mise à jour');
         }
@@ -22,9 +23,9 @@ function ChangeEmailForm() {
     return (
         <form onSubmit={handleSubmit}>
             <label>Ancienne adresse</label><br />
-            <input type="email" name="oldEmail" onChange={handleChange} className="form-control" required /><br /><br />
+            <input type="email" name="oldEmail" value={form.oldEmail} onChange={handleChange} className="form-control" required /><br /><br />
             <label>Nouvelle adresse</label><br />
-            <input type="email" name="newEmail" onChange={handleChange} className="form-control" required /><br /><br />
+            <input type="email" name="newEmail" value={form.newEmail} onChange={handleChange} className="form-control" required /><br /><br />
             <div className="form-container">
                 <button type="submit">Modifier</button>
                 {message && <p>{message}</p>}

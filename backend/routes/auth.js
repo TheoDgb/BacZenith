@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const pool = require('../config');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const pool = require('../config');
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // REGISTER

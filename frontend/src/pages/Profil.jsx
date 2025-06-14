@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import ChangeEmailForm from '../components/ChangeEmailForm';
 import ChangePasswordForm from '../components/ChangePasswordForm';
+import TuteurProfil from "../components/TuteurProfil.jsx";
 
 function Profil() {
     const { user, loading } = useContext(AuthContext);
@@ -20,6 +21,9 @@ function Profil() {
             <hr />
             <h3>Modifier le mot de passe</h3>
             <ChangePasswordForm />
+
+            <TuteurProfil/>
+            <br />
         </div>
     );
 }

@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
         specialite,
         session,
         page = 1,
-        limit = 3
+        limit = 5
     } = req.query;
 
     const offset = (page - 1) * limit;

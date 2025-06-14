@@ -30,7 +30,7 @@ function ListeSujets() {
     };
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const limit = 3;
+    const limit = 5;
 
 
 

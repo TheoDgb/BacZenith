@@ -160,10 +160,33 @@ router.post('/:id/accepter', auth, authorizeRoles('admin'), async (req, res) => 
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
         // Créer le compte tuteur
-        await pool.query(
+        const userResult = await pool.query(
             `INSERT INTO users (nom, prenom, email, password, role)
-             VALUES ($1, $2, $3, $4, 'tuteur')`,
+             VALUES ($1, $2, $3, $4, 'tuteur') RETURNING id`,
             [candidat.nom, candidat.prenom, candidat.email, hashedPassword]
+        );
+        const userId = userResult.rows[0].id; // Récupérer son ID
+
+        // Récupère les matières de la candidature depuis candidature_matieres
+        const matieresResult = await pool.query(
+            'SELECT matiere FROM candidature_matieres WHERE candidature_id = $1',
+            [id]
+        );
+        const matieres = matieresResult.rows.map(row => row.matiere);
+
+        // Insère les matières dans tuteur_matieres
+        for (const matiere of matieres) {
+            await pool.query(
+                'INSERT INTO tuteur_matieres (tuteur_id, matiere) VALUES ($1, $2)',
+                [userId, matiere]
+            );
+        }
+
+        // Créer un profil tuteur vide qu'il pourra remplir
+        await pool.query(
+            `INSERT INTO tuteur_profils (user_id, description, disponibilites)
+            VALUES ($1, '', '')`,
+            [userId]
         );
 
         // Supprimer les lignes liées
