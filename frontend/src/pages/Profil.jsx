@@ -8,7 +8,6 @@ function Profil() {
     const { user, loading } = useContext(AuthContext);
 
     if (loading) return <p>Chargement du profil...</p>;
-
     if (!user) return <p>Utilisateur non connecté</p>; // ou redirect vers login
 
     return (
@@ -22,7 +21,7 @@ function Profil() {
             <h3>Modifier le mot de passe</h3>
             <ChangePasswordForm />
 
-            <TuteurProfil/>
+            {user.role === 'tuteur' && <TuteurProfil />}
             <br />
         </div>
     );
