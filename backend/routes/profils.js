@@ -1,10 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const pool = require('../config');
+const { auth, authorizeRoles } = require('../middlewares/auth');
+const bcrypt = require('bcrypt');
+
+function checkOwnershipOrAdmin(req, res, next) {
+    const { id } = req.params;
+    if (req.user.role !== 'admin' && req.user.id !== parseInt(id, 10)) {
+        return res.status(403).json({ error: 'Accès refusé : modification non autorisée' });
+    }
+    next();
+}
 
 // Changer l'email
-router.put('/:id/email', async (req, res) => {
+router.put('/:id/email', auth, authorizeRoles('eleve', 'tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;
     const { oldEmail, newEmail } = req.body;
 
@@ -24,7 +33,7 @@ router.put('/:id/email', async (req, res) => {
 });
 
 // Changer le mot de passe
-router.put('/:id/password', async (req, res) => {
+router.put('/:id/password', auth, authorizeRoles('eleve', 'tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;
     const { oldPassword, newPassword } = req.body;
 
@@ -47,7 +56,7 @@ router.put('/:id/password', async (req, res) => {
 });
 
 // Infos tuteur
-router.get('/:id/tuteur', async (req, res) => {
+router.get('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -74,7 +83,7 @@ router.get('/:id/tuteur', async (req, res) => {
 });
 
 // Mettre à jour le profil tuteur
-router.put('/:id/tuteur', async (req, res) => {
+router.put('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;
     const { description, disponibilites, tarif } = req.body;
 
