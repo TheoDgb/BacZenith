@@ -146,8 +146,8 @@ function ListeSujets() {
                 </button>
 
                 <span style={{ margin: '0 1rem' }}>
-    Page {page} / {Math.ceil(total / limit)}
-  </span>
+                    Page {page} / {Math.ceil(total / limit)}
+                </span>
 
                 <button
                     onClick={() =>
@@ -158,7 +158,6 @@ function ListeSujets() {
                     Suivant
                 </button>
             </div>
-
         </div>
     );
 }

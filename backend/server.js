@@ -5,6 +5,7 @@ const candidaturesRoutes = require('./routes/candidatures');
 const authRoutes = require('./routes/auth');
 const profilsRoutes = require('./routes/profils');
 const sujetsRoutes = require('./routes/sujets');
+const aideRoutes = require('./routes/aide');
 require('dotenv').config();
 const sendMail = require('./utils/sendMail');
 

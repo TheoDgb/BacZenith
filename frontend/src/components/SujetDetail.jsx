@@ -46,8 +46,8 @@ function SujetDetail() {
                     <h3>Sujet :</h3>
                     <iframe
                         src={sujetPdf}
-                        width="100%"
-                        height="600px"
+                        width="150%"
+                        height="985"
                         title="Sujet PDF"
                     />
                     <a href={sujetPdf} download target="_blank" rel="noopener noreferrer">

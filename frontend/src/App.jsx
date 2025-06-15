@@ -6,10 +6,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ListeSujets from './components/ListeSujets';
 import SujetDetail from './components/SujetDetail';
+import DemanderAideTuteur from './pages/DemanderAideTuteur.jsx';
+import AiderEleve from './pages/AiderEleve.jsx';
 import AdminAccueil from './pages/AdminAccueil.jsx';
 import AdminSujets from './pages/AdminSujets.jsx';
 import AdminCandidatures from './pages/AdminCandidatures.jsx';
 import Profil from "./pages/Profil.jsx";
+
 
 function PrivateRoute({ children, allowedRoles }) {
     const { user, loading } = useContext(AuthContext);
@@ -41,11 +44,13 @@ function App() {
                         {user.role === 'eleve' && (
                             <>
                                 <Link to="/profils">Profil élève</Link> |{' '}
+                                <Link to="/demanderAideTuteur">Demander de l'aide</Link> |{' '}
                             </>
                         )}
                         {user.role === 'tuteur' && (
                             <>
                                 <Link to="/profils">Profil tuteur</Link> |{' '}
+                                <Link to="/aiderEleve">Aider un élève</Link> |{' '}
                             </>
                         )}
                         {user.role === 'admin' && (
@@ -72,6 +77,26 @@ function App() {
                     element={
                         <PrivateRoute allowedRoles={['eleve', 'tuteur', 'admin']}>
                             <Profil />
+                        </PrivateRoute>
+                    }
+                />
+
+                {/*Routes élèves*/}
+                <Route
+                    path="/demanderAideTuteur"
+                    element={
+                        <PrivateRoute allowedRoles={['eleve', 'admin']}>
+                            <DemanderAideTuteur />
+                        </PrivateRoute>
+                    }
+                />
+
+                {/*Routes tuteurs*/}
+                <Route
+                    path="/aiderEleve"
+                    element={
+                        <PrivateRoute allowedRoles={['eleve', 'tuteur', 'admin']}>
+                            <AiderEleve />
                         </PrivateRoute>
                     }
                 />
