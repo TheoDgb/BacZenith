@@ -46,7 +46,7 @@ router.put('/:id/password', async (req, res) => {
     }
 });
 
-// Infos tuteur (description, disponibilites, tarif, matieres)
+// Infos tuteur
 router.get('/:id/tuteur', async (req, res) => {
     const { id } = req.params;
 
@@ -73,13 +73,25 @@ router.get('/:id/tuteur', async (req, res) => {
     }
 });
 
-// Mettre à jour le profil tuteur (description, disponibilites, tarif, matieres)
+// Mettre à jour le profil tuteur
 router.put('/:id/tuteur', async (req, res) => {
     const { id } = req.params;
     const { description, disponibilites, tarif } = req.body;
 
     const client = await pool.connect();
     try {
+        // Vérifier que le tuteur est certifié pour modifier son tarif
+        const { rows: [profil] } = await pool.query(
+            'SELECT is_certified FROM tuteur_profils WHERE user_id = $1',
+            [id]
+        );
+        if (!profil) {
+            return res.status(404).json({ error: 'Profil tuteur introuvable' });
+        }
+        const tarifFinal = (!tarif || tarif.trim() === '')
+            ? 'Service gratuit'
+            : (profil.is_certified ? tarif : 'Service gratuit');
+
         await client.query('BEGIN');
 
         // Update tuteur_profils
@@ -90,7 +102,7 @@ router.put('/:id/tuteur', async (req, res) => {
                  tarif = $3,
                  updated_at = CURRENT_TIMESTAMP
              WHERE user_id = $4`,
-            [description, disponibilites, tarif || null, id]
+            [description, disponibilites, tarifFinal, id]
         );
 
         await client.query('COMMIT');

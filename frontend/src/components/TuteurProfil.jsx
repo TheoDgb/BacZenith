@@ -8,8 +8,9 @@ function TuteurProfil() {
     const [formData, setFormData] = useState({
         description: '',
         disponibilites: '',
-        tarif: '',
-        matieres: []
+        tarif: 'Service gratuit',
+        matieres: [],
+        is_certified: false
     });
 
     useEffect(() => {
@@ -20,8 +21,9 @@ function TuteurProfil() {
             setFormData({
                 description: data.description || '',
                 disponibilites: data.disponibilites || '',
-                tarif: data.tarif || '',
-                matieres: data.matieres || []
+                tarif: data.tarif || 'Service gratuit',
+                matieres: data.matieres || [],
+                is_certified: data.is_certified || false
             });
         };
         if (user.role === 'tuteur') fetchProfil();
@@ -35,14 +37,17 @@ function TuteurProfil() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
+
+            // Corriger l'affichage si tarif est vide
+            setFormData(prev => ({
+                ...prev,
+                tarif: prev.tarif.trim() === '' ? 'Service gratuit' : prev.tarif
+            }));
+
             setMessage('Profil tuteur mis à jour avec succès.');
         } catch (err) {
             setMessage("Erreur lors de la mise à jour du profil tuteur.");
         }
-    };
-
-    const handleMatiereChange = (e) => {
-        setFormData({ ...formData, matieres: e.target.value.split(',').map(m => m.trim()) });
     };
 
     return (
@@ -76,7 +81,17 @@ function TuteurProfil() {
                     value={formData.tarif}
                     onChange={e => setFormData({ ...formData, tarif: e.target.value })}
                     className="form-control"
-                /><br /><br />
+                    disabled={!formData.is_certified}
+                />
+                {!formData.is_certified ? (
+                    <p style={{ color: 'gray', fontStyle: 'italic' }}>
+                        Vous devez être certifié pour pouvoir fixer un tarif.
+                    </p>
+                ) : (
+                    <>
+                        <br /><br />
+                    </>
+                )}
                 <div className="form-container">
                     <button type="submit">Mettre à jour</button>
                     {message && <p>{message}</p>}
