@@ -29,6 +29,9 @@ export default function DemanderAideTuteur() {
     const limit = 5;
     const [selectedSujetId, setSelectedSujetId] = useState(null);
     const [matiereAutre, setMatiereAutre] = useState('');
+    const [contactType, setContactType] = useState('laisser');
+    const [tuteurSpecifique, setTuteurSpecifique] = useState('');
+
 
     // Charger les options au montage
     useEffect(() => {
@@ -200,7 +203,8 @@ export default function DemanderAideTuteur() {
             )}
             {typeAide === 'autre' && (
                 <div style={{ marginTop: '1rem' }}>
-                    <label htmlFor="matiereAutre">Sélectionnez une matière : </label>
+                    <label htmlFor="matiereAutre">Sélectionnez la matière concernée par votre demande : </label>
+                    <br />
                     <select
                         id="matiereAutre"
                         name="matiereAutre"
@@ -214,6 +218,43 @@ export default function DemanderAideTuteur() {
                     </select>
                 </div>
             )}
+            <hr />
+            <div style={{ marginTop: '1rem' }}>
+                <p>Comment souhaitez-vous être contacté ?</p>
+                <label>
+                    <input
+                        type="radio"
+                        name="contactType"
+                        value="laisser"
+                        checked={contactType === 'laisser'}
+                        onChange={() => setContactType('laisser')}
+                    />
+                    Laisser un tuteur me contacter
+                </label>
+                <br />
+                <label>
+                    <input
+                        type="radio"
+                        name="contactType"
+                        value="specifique"
+                        checked={contactType === 'specifique'}
+                        onChange={() => setContactType('specifique')}
+                    />
+                    Contacter un tuteur spécifique
+                </label>
+
+                {contactType === 'specifique' && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                        <input
+                            type="text"
+                            placeholder="Nom ou email du tuteur"
+                            value={tuteurSpecifique}
+                            onChange={(e) => setTuteurSpecifique(e.target.value)}
+                            className="form-control"
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
