@@ -21,6 +21,7 @@ app.use('/api/candidatures', candidaturesRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profils', profilsRoutes);
 app.use('/api/sujets', sujetsRoutes);
+app.use('/api/aide', aideRoutes);
 
 // Test de serveur
 app.get('/', (req, res) => {

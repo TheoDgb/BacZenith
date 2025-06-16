@@ -117,6 +117,29 @@ export default function DemanderAideTuteur() {
         fetchTuteurs();
     }, [matiereSelectionnee, rechercheNom, pageTuteur]);
 
+    const handleSubmit = async () => {
+        try {
+            const payload = {
+                type_aide: typeAide,
+                sujet_id: typeAide === 'bac' ? selectedSujetId : null,
+                matiere: matiereSelectionnee,
+                tuteur_id: contactType === 'specifique' ? tuteurSelectionneId : null,
+                contact_type: contactType,
+                message: raisonAide
+            };
+
+            await axios.post('/api/aide/demandes', payload);
+            alert("Demande envoyée !");
+            // reset formulaire
+            setRaisonAide('');
+            setSelectedSujetId(null);
+            setContactType('laisser');
+        } catch (error) {
+            console.error("Erreur lors de l'envoi :", error);
+            alert("Erreur lors de l'envoi de la demande.");
+        }
+    };
+
     return (
         <div>
             <h2>Demander l’aide d’un tuteur</h2>
@@ -358,9 +381,17 @@ export default function DemanderAideTuteur() {
                                 placeholder="Décrivez votre difficulté ou votre besoin spécifique..."
                                 value={raisonAide}
                                 onChange={(e) => setRaisonAide(e.target.value)}
+                                required
                             />
                         </div>
-                        <br/>
+                        <br />
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!raisonAide || (contactType === 'specifique' && !tuteurSelectionneId)}
+                        >
+                            Envoyer la demande d’aide
+                        </button>
                     </div>
                 </>
             )}
