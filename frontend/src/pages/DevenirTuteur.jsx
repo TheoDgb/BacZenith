@@ -123,7 +123,7 @@ export default function DevenirTuteur() {
                 </div>
                 <br />
                 <div className="form-container">
-                    <textarea name="motivation" placeholder="Motivation / Expérience" value={form.motivation} onChange={handleChange} className="form-control" required />
+                    <textarea name="motivation" placeholder="Motivation / Expérience" value={form.motivation} onChange={handleChange} className="form-control textarea" required />
                 </div>
                 <br />
                 <div className="form-container">

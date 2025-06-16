@@ -66,14 +66,14 @@ function TuteurProfil() {
                     value={formData.description}
                     onChange={e => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
-                    className="form-control"
+                    className="form-control textarea"
                 /><br /><br />
                 <label>Disponibilités :</label><br />
                 <textarea
                     value={formData.disponibilites}
                     onChange={e => setFormData({ ...formData, disponibilites: e.target.value })}
                     rows={3}
-                    className="form-control"
+                    className="form-control textarea"
                 /><br /><br />
                 <label>Tarif (optionnel) :</label><br />
                 <input

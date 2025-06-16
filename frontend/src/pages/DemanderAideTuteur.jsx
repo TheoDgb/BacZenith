@@ -27,6 +27,7 @@ export default function DemanderAideTuteur() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const limit = 5;
+
     const [selectedSujetId, setSelectedSujetId] = useState(null);
     const [matiereAutre, setMatiereAutre] = useState(MATIERES[0] || '');
     const [contactType, setContactType] = useState('laisser');
@@ -34,9 +35,10 @@ export default function DemanderAideTuteur() {
     const [tuteurs, setTuteurs] = useState([]);
     const [totalTuteurs, setTotalTuteurs] = useState(0);
     const [pageTuteur, setPageTuteur] = useState(1);
+
     const [rechercheNom, setRechercheNom] = useState('');
     const [tuteurSelectionneId, setTuteurSelectionneId] = useState(null);
-
+    const [raisonAide, setRaisonAide] = useState('');
 
     const matiereSelectionnee = (() => {
         if (typeAide === 'bac') {
@@ -345,6 +347,20 @@ export default function DemanderAideTuteur() {
                                 </div>
                             </div>
                         )}
+                        <hr />
+                        <div style={{ marginTop: '1rem' }}>
+                            <label htmlFor="raisonAide"><strong>Expliquez pourquoi vous avez besoin d’aide :</strong></label>
+                            <br />
+                            <textarea
+                                id="raisonAide"
+                                name="raisonAide"
+                                className="form-control textarea"
+                                placeholder="Décrivez votre difficulté ou votre besoin spécifique..."
+                                value={raisonAide}
+                                onChange={(e) => setRaisonAide(e.target.value)}
+                            />
+                        </div>
+                        <br/>
                     </div>
                 </>
             )}
