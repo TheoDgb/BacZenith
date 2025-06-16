@@ -125,6 +125,44 @@ router.put('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershi
     }
 });
 
+// Liste des tuteurs filtrés par matière et nom/prénom
+router.get('/tuteurs', auth, authorizeRoles('eleve', 'admin'), async (req, res) => {
+    const { matiere, nom = '', page = 1, limit = 5 } = req.query;
+    const offset = (page - 1) * limit;
+
+    try {
+        const baseQuery = `
+            FROM users u
+            JOIN tuteur_profils tp ON tp.user_id = u.id
+            JOIN tuteur_matieres tm ON tm.tuteur_id = u.id
+            WHERE LOWER(CONCAT(u.nom, ' ', u.prenom)) LIKE $1
+              AND tm.matiere = $2
+        `;
+
+        const countRes = await pool.query(
+            `SELECT COUNT(*) ${baseQuery}`,
+            [`%${nom.toLowerCase()}%`, matiere]
+        );
+        const total = parseInt(countRes.rows[0].count, 10);
+
+        const dataRes = await pool.query(
+            `SELECT u.id, u.nom, u.prenom, tp.description, tp.tarif, tp.disponibilites
+             ${baseQuery}
+             ORDER BY u.nom ASC
+             LIMIT $3 OFFSET $4`,
+            [`%${nom.toLowerCase()}%`, matiere, limit, offset]
+        );
+
+        res.json({
+            total,
+            tuteurs: dataRes.rows
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erreur chargement des tuteurs' });
+    }
+});
+
 
 
 module.exports = router;

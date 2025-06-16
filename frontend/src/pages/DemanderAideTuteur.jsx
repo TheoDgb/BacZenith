@@ -28,10 +28,25 @@ export default function DemanderAideTuteur() {
     const [total, setTotal] = useState(0);
     const limit = 5;
     const [selectedSujetId, setSelectedSujetId] = useState(null);
-    const [matiereAutre, setMatiereAutre] = useState('');
+    const [matiereAutre, setMatiereAutre] = useState(MATIERES[0] || '');
     const [contactType, setContactType] = useState('laisser');
-    const [tuteurSpecifique, setTuteurSpecifique] = useState('');
 
+    const [tuteurs, setTuteurs] = useState([]);
+    const [totalTuteurs, setTotalTuteurs] = useState(0);
+    const [pageTuteur, setPageTuteur] = useState(1);
+    const [rechercheNom, setRechercheNom] = useState('');
+    const [tuteurSelectionneId, setTuteurSelectionneId] = useState(null);
+
+
+    const matiereSelectionnee = (() => {
+        if (typeAide === 'bac') {
+            const sujet = sujets.find(s => s.id === selectedSujetId);
+            return sujet?.matiere || '';
+        } else if (typeAide === 'autre') {
+            return matiereAutre;
+        }
+        return '';
+    })();
 
     // Charger les options au montage
     useEffect(() => {
@@ -78,6 +93,27 @@ export default function DemanderAideTuteur() {
             session: '',
         });
     };
+
+    useEffect(() => {
+        const fetchTuteurs = async () => {
+            if (!matiereSelectionnee) return;
+            try {
+                const res = await axios.get('/api/profils/tuteurs', {
+                    params: {
+                        matiere: matiereSelectionnee,
+                        nom: rechercheNom,
+                        page: pageTuteur,
+                        limit: 5,
+                    }
+                });
+                setTuteurs(res.data.tuteurs);
+                setTotalTuteurs(res.data.total);
+            } catch (err) {
+                console.error('Erreur chargement tuteurs :', err);
+            }
+        };
+        fetchTuteurs();
+    }, [matiereSelectionnee, rechercheNom, pageTuteur]);
 
     return (
         <div>
@@ -173,7 +209,6 @@ export default function DemanderAideTuteur() {
                                 >
                                     {selectedSujetId === sujet.id ? 'Sujet sélectionné' : 'Sélectionner ce sujet'}
                                 </button>
-
                                 <hr />
                             </li>
                         ))}
@@ -218,43 +253,101 @@ export default function DemanderAideTuteur() {
                     </select>
                 </div>
             )}
-            <hr />
-            <div style={{ marginTop: '1rem' }}>
-                <p>Comment souhaitez-vous être contacté ?</p>
-                <label>
-                    <input
-                        type="radio"
-                        name="contactType"
-                        value="laisser"
-                        checked={contactType === 'laisser'}
-                        onChange={() => setContactType('laisser')}
-                    />
-                    Laisser un tuteur me contacter
-                </label>
-                <br />
-                <label>
-                    <input
-                        type="radio"
-                        name="contactType"
-                        value="specifique"
-                        checked={contactType === 'specifique'}
-                        onChange={() => setContactType('specifique')}
-                    />
-                    Contacter un tuteur spécifique
-                </label>
+            {matiereSelectionnee && (
+                <>
+                    <hr />
+                    <div style={{ marginTop: '1rem' }}>
+                        <p>Comment souhaitez-vous être contacté ?</p>
+                        <label>
+                            <input
+                                type="radio"
+                                name="contactType"
+                                value="laisser"
+                                checked={contactType === 'laisser'}
+                                onChange={() => {
+                                    setContactType('laisser');
+                                    setTuteurSelectionneId(null);
+                                }}
+                            />
+                            Laisser un tuteur me contacter
+                        </label>
+                        <br />
+                        <label>
+                            <input
+                                type="radio"
+                                name="contactType"
+                                value="specifique"
+                                checked={contactType === 'specifique'}
+                                onChange={() => setContactType('specifique')}
+                            />
+                            Contacter un tuteur spécifique
+                        </label>
 
-                {contactType === 'specifique' && (
-                    <div style={{ marginTop: '0.5rem' }}>
-                        <input
-                            type="text"
-                            placeholder="Nom ou email du tuteur"
-                            value={tuteurSpecifique}
-                            onChange={(e) => setTuteurSpecifique(e.target.value)}
-                            className="form-control"
-                        />
+                        {contactType === 'specifique' && (
+                            <div style={{ marginTop: '0.5rem' }}>
+                                <h3>Tuteurs disponibles pour : {matiereSelectionnee}</h3>
+
+                                <input
+                                    type="text"
+                                    placeholder="Nom / Prénom"
+                                    value={rechercheNom}
+                                    onChange={(e) => {
+                                        setRechercheNom(e.target.value);
+                                        setPageTuteur(1);
+                                    }}
+                                    className="form-control"
+                                />
+                                <hr />
+                                <ul>
+                                    {tuteurs.map((tuteur) => (
+                                        <li key={tuteur.id} style={{ marginBottom: '1rem' }}>
+                                            <strong>{tuteur.nom} {tuteur.prenom}</strong><br />
+                                            {tuteur.description}<br />
+                                            Tarif : {tuteur.tarif}<br />
+                                            Disponibilités : {tuteur.disponibilites || 'Non renseignées'}
+
+                                            <br />
+                                            <button
+                                                onClick={() => setTuteurSelectionneId(tuteur.id)}
+                                                style={{
+                                                    marginTop: '0.5rem',
+                                                    backgroundColor: tuteurSelectionneId === tuteur.id ? 'green' : '#eee',
+                                                    color: tuteurSelectionneId === tuteur.id ? 'white' : 'black',
+                                                    border: '1px solid #ccc',
+                                                    padding: '0.5rem 1rem',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {tuteurSelectionneId === tuteur.id ? 'Tuteur sélectionné' : 'Sélectionner ce tuteur'}
+                                            </button>
+                                            <hr />
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div>
+                                    <button
+                                        onClick={() => setPageTuteur((p) => Math.max(p - 1, 1))}
+                                        disabled={pageTuteur === 1}
+                                    >
+                                        Précédent
+                                    </button>
+
+                                    <span style={{ margin: '0 1rem' }}>
+                                        Page {pageTuteur} / {Math.ceil(totalTuteurs / 5)}
+                                    </span>
+                                    <button
+                                        onClick={() => setPageTuteur((p) => (p < Math.ceil(totalTuteurs / 5) ? p + 1 : p))}
+                                        disabled={pageTuteur >= Math.ceil(totalTuteurs / 5)}
+                                    >
+                                        Suivant
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
+                </>
+            )}
         </div>
     );
 }
