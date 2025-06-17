@@ -12,6 +12,33 @@ function checkOwnershipOrAdmin(req, res, next) {
     next();
 }
 
+// Récupérer les informations du tuteur, dont matières liées
+router.get('/me/tuteur', auth, authorizeRoles('tuteur'), async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const { rows: profils } = await pool.query(
+            'SELECT * FROM tuteur_profils WHERE user_id = $1',
+            [userId]
+        );
+        const profil = profils[0];
+        if (!profil) return res.status(404).json({ error: 'Profil tuteur introuvable' });
+
+        const { rows: matieres } = await pool.query(
+            'SELECT matiere FROM tuteur_matieres WHERE tuteur_id = $1',
+            [userId]
+        );
+
+        res.json({
+            ...profil,
+            matieres: matieres.map(m => m.matiere)
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erreur serveur (get profil tuteur)' });
+    }
+});
+
 // Changer l'email
 router.put('/:id/email', auth, authorizeRoles('eleve', 'tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;

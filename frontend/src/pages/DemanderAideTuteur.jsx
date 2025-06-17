@@ -170,7 +170,7 @@ export default function DemanderAideTuteur() {
 
             {typeAide === 'bac' && (
                 <>
-                    <h3>Filtrer les sujets de BAC</h3>
+                    <h3>Rechercher un sujet de BAC</h3>
                     <div className="form-container">
                         <select name="annee" value={filters.annee} onChange={handleFilterChange} className="form-control">
                             <option value="">Année</option>

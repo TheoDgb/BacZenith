@@ -95,7 +95,7 @@ function App() {
                 <Route
                     path="/aiderEleve"
                     element={
-                        <PrivateRoute allowedRoles={['eleve', 'tuteur', 'admin']}>
+                        <PrivateRoute allowedRoles={['tuteur', 'admin']}>
                             <AiderEleve />
                         </PrivateRoute>
                     }
