@@ -8,6 +8,7 @@ export default function AiderEleve() {
     const [demandes, setDemandes] = useState([]);
     const [matieres, setMatieres] = useState([]);
     const [matiereFiltre, setMatiereFiltre] = useState('');
+    const [affectationFiltre, setAffectationFiltre] = useState('me'); // 'me' | 'none' | 'all'
 
     useEffect(() => {
         const fetchMatieres = async () => {
@@ -26,6 +27,7 @@ export default function AiderEleve() {
             try {
                 const res = await axios.get('/api/aide/demandes', {
                     params: {
+                        affectation: affectationFiltre,
                         type_aide: typeAide,
                         order: order,
                         ...(matiereFiltre ? { matiere: matiereFiltre } : {})
@@ -37,14 +39,21 @@ export default function AiderEleve() {
             }
         };
         fetchDemandes();
-    }, [typeAide, order, matiereFiltre]);
-
+    }, [typeAide, order, matiereFiltre, affectationFiltre]);
 
     return (
         <div>
             <h2>Aider un élève</h2>
             <h3>Sélectionner une demande d'aide :</h3>
             <div className="form-container">
+                <select
+                    className="form-control"
+                    value={affectationFiltre}
+                    onChange={(e) => setAffectationFiltre(e.target.value)}
+                >
+                    <option value="me">Affectées à moi</option>
+                    <option value="none">Non affectées</option>
+                </select>
                 <select
                     className="form-control"
                     value={typeAide}

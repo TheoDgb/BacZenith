@@ -24,7 +24,7 @@ router.post('/demandes', auth, authorizeRoles('eleve'), async (req, res) => {
 
 // Voir les demandes d'aide
 router.get('/demandes', auth, authorizeRoles('tuteur'), async (req, res) => {
-    const { type_aide, order = 'desc', matiere } = req.query;
+    const { affectation = 'me', type_aide, matiere, order = 'desc' } = req.query;
     const userId = req.user.id;
 
     try {
@@ -33,19 +33,33 @@ router.get('/demandes', auth, authorizeRoles('tuteur'), async (req, res) => {
             [userId]
         );
         const matieres = matieresResult.rows.map(r => r.matiere);
-
-        // Si une matière spécifique est demandée, on filtre uniquement dessus (si elle fait partie des matières autorisées)
         const selectedMatieres = matiere && matieres.includes(matiere) ? [matiere] : matieres;
 
-        const demandes = await pool.query(
-            `SELECT d.*, u.nom, u.prenom, s.annee, s.serie, s.epreuve, s.session, s.num_sujet
-             FROM demandes_aide d
-             JOIN users u ON d.user_id = u.id
-             LEFT JOIN sujets s ON d.sujet_id = s.id
-             WHERE d.matiere = ANY($1) AND d.type_aide = $2
-             ORDER BY d.created_at ${order.toUpperCase()}`,
-            [selectedMatieres, type_aide]
-        );
+        let affectationClause = '';
+        const values = [selectedMatieres, type_aide];
+        let i = 3;
+
+        if (affectation === 'me') {
+            affectationClause = `AND d.tuteur_id = $${i++}`;
+            values.push(userId);
+        } else if (affectation === 'none') {
+            affectationClause = `AND d.tuteur_id IS NULL`;
+        }
+
+        const orderSQL = order.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+
+        const query = `
+            SELECT d.*, u.nom, u.prenom, s.annee, s.serie, s.epreuve, s.session, s.num_sujet
+            FROM demandes_aide d
+            JOIN users u ON d.user_id = u.id
+            LEFT JOIN sujets s ON d.sujet_id = s.id
+            WHERE d.matiere = ANY($1)
+                AND d.type_aide = $2
+                ${affectationClause}
+            ORDER BY d.created_at ${orderSQL}
+        `;
+
+        const demandes = await pool.query(query, values);
 
         res.json(demandes.rows);
     } catch (err) {
