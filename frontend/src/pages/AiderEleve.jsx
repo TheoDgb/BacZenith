@@ -43,66 +43,42 @@ export default function AiderEleve() {
     return (
         <div>
             <h2>Aider un élève</h2>
-            <form>
-                <p>Type de demande :</p>
-                <label>
-                    <input
-                        type="radio"
-                        name="typeAide"
-                        value="bac"
-                        checked={typeAide === 'bac'}
-                        onChange={(e) => setTypeAide(e.target.value)}
-                    />
-                    Sujet de BAC
-                </label>
-                <br />
-                <label>
-                    <input
-                        type="radio"
-                        name="typeAide"
-                        value="autre"
-                        checked={typeAide === 'autre'}
-                        onChange={(e) => setTypeAide(e.target.value)}
-                    />
-                    Autre
-                </label>
-            </form>
-
-            <div style={{ marginTop: '1rem' }}>
-                <h3>Sélectionner une demande d'aide :</h3>
-                <div className="form-container">
-                    <button
-                        type="button"
-                        onClick={() => setOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                        className="form-control"
-                    >
-                        {order === 'desc' ? 'Plus récentes' : 'Plus anciennes'}
-                    </button>
-
-                    <select
-                        className="form-control"
-                        value={matiereFiltre}
-                        onChange={(e) => setMatiereFiltre(e.target.value)}
-                    >
-                        <option value="">Toutes les matières</option>
-                        {matieres.map((m) => (
-                            <option key={m} value={m}>{m}</option>
-                        ))}
-                    </select>
-
-
-                </div>
+            <h3>Sélectionner une demande d'aide :</h3>
+            <div className="form-container">
+                <select
+                    className="form-control"
+                    value={typeAide}
+                    onChange={(e) => setTypeAide(e.target.value)}
+                >
+                    <option value="bac">Sujet de BAC</option>
+                    <option value="autre">Autre demande</option>
+                </select>
+                <select
+                    className="form-control"
+                    value={matiereFiltre}
+                    onChange={(e) => setMatiereFiltre(e.target.value)}
+                >
+                    <option value="">Toutes les matières</option>
+                    {matieres.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                    ))}
+                </select>
+                <button
+                    type="button"
+                    onClick={() => setOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                    className="form-control"
+                >
+                    {order === 'desc' ? 'Plus récentes' : 'Plus anciennes'}
+                </button>
             </div>
-
             <hr />
-
             <ul>
                 {demandes.map((demande) => (
                     <li key={demande.id}>
                         <strong>Demande de {demande.nom} {demande.prenom}</strong> - {new Date(demande.created_at).toLocaleDateString()}<br />
                         {typeAide === 'bac' ? (
                             <>
-                                Sujet :<br />
+                                <strong>Sujet :</strong><br />
                                 <Link to={`/sujets/${demande.id}`}>
                                     <strong>{demande.annee} - {demande.matiere}</strong>
                                 </Link><br />
@@ -114,7 +90,7 @@ export default function AiderEleve() {
                             </>
                         ) : (
                             <>
-                                Matière : {demande.matiere}<br />
+                                <strong>Matière : </strong>{demande.matiere}<br />
                             </>
                         )}
                         <p><strong>Message :</strong> {demande.message}</p>
