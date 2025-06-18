@@ -68,6 +68,31 @@ router.get('/demandes', auth, authorizeRoles('tuteur'), async (req, res) => {
     }
 });
 
+// Prendre en charge une demande
+router.post('/demandes/:id/prendre', auth, authorizeRoles('tuteur'), async (req, res) => {
+    const demandeId = req.params.id;
+    const tuteurId = req.user.id;
+
+    try {
+        const result = await pool.query(
+            `UPDATE demandes_aide
+             SET tuteur_id = $1, en_cours = true
+             WHERE id = $2 AND (tuteur_id IS NULL OR tuteur_id = $1)
+             RETURNING *`,
+            [tuteurId, demandeId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(400).json({ error: "Demande déjà prise ou inexistante." });
+        }
+
+        res.json({ success: true, demande: result.rows[0] });
+    } catch (err) {
+        console.error('Erreur lors de l’assignation de la demande :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+});
+
 
 
 module.exports = router;

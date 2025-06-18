@@ -330,7 +330,6 @@ export default function DemanderAideTuteur() {
                                             {tuteur.description}<br />
                                             Tarif : {tuteur.tarif}<br />
                                             Disponibilités : {tuteur.disponibilites || 'Non renseignées'}
-
                                             <br />
                                             <button
                                                 onClick={() => setTuteurSelectionneId(tuteur.id)}

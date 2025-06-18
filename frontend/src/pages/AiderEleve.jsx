@@ -9,6 +9,7 @@ export default function AiderEleve() {
     const [matieres, setMatieres] = useState([]);
     const [matiereFiltre, setMatiereFiltre] = useState('');
     const [affectationFiltre, setAffectationFiltre] = useState('me'); // 'me' | 'none' | 'all'
+    const [demandeSelectionneeId, setDemandeSelectionneeId] = useState(null);
 
     useEffect(() => {
         const fetchMatieres = async () => {
@@ -103,10 +104,51 @@ export default function AiderEleve() {
                             </>
                         )}
                         <p><strong>Message :</strong> {demande.message}</p>
+                        <button
+                            onClick={() => setDemandeSelectionneeId(demande.id)}
+                            style={{
+                                marginTop: '0.5rem',
+                                backgroundColor: demandeSelectionneeId === demande.id ? 'green' : '#eee',
+                                color: demandeSelectionneeId === demande.id ? 'white' : 'black',
+                                border: '1px solid #ccc',
+                                padding: '0.5rem 1rem',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {demandeSelectionneeId === demande.id ? 'Demande sélectionnée' : 'Sélectionner cette demande'}
+                        </button>
                         <hr />
                     </li>
                 ))}
             </ul>
+            {demandeSelectionneeId && (
+                <div style={{ marginTop: '1rem' }}>
+                    <button
+                        onClick={async () => {
+                            try {
+                                await axios.post(`/api/aide/demandes/${demandeSelectionneeId}/prendre`);
+                                alert('Demande prise en charge avec succès.');
+                                setDemandeSelectionneeId(null);
+                                // Recharger les demandes
+                                const res = await axios.get('/api/aide/demandes', {
+                                    params: {
+                                        affectation: affectationFiltre,
+                                        type_aide: typeAide,
+                                        order: order,
+                                        ...(matiereFiltre ? { matiere: matiereFiltre } : {})
+                                    }
+                                });
+                                setDemandes(res.data);
+                            } catch (err) {
+                                console.error(err);
+                                alert('Erreur : impossible de prendre la demande.');
+                            }
+                        }}
+                    >
+                        Prendre en charge cette demande
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
