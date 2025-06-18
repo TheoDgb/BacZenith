@@ -55,6 +55,7 @@ router.get('/demandes', auth, authorizeRoles('tuteur'), async (req, res) => {
             LEFT JOIN sujets s ON d.sujet_id = s.id
             WHERE d.matiere = ANY($1)
                 AND d.type_aide = $2
+                AND d.en_cours = false
                 ${affectationClause}
             ORDER BY d.created_at ${orderSQL}
         `;
