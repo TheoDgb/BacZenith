@@ -93,6 +93,6 @@ app.post('/test-mail', async (req, res) => {
     }
 });
 
-    server.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Serveur backend lancé sur http://localhost:${PORT}`);
 });

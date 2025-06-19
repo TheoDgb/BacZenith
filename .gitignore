@@ -1,6 +1,9 @@
-/backend/.env
 /node_modules/
+
+/backend/.env
 /backend/node_modules/
+
+/frontend/.env
 /frontend/node_modules/
 
 /db.sql

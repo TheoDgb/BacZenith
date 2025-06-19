@@ -10,6 +10,7 @@ const MessagerieWidget = () => {
     const [messages, setMessages] = useState([]);
     const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
+    const messagesEndRef = useRef(null);
 
     const socketRef = useRef(null);
     useEffect(() => {
@@ -108,6 +109,12 @@ const MessagerieWidget = () => {
         }
     };
 
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
+
     if (!user) return null; // Ne rien afficher si non connecté
 
     return (
@@ -201,6 +208,7 @@ const MessagerieWidget = () => {
                             ) : (
                                 <p style={{ color: '#bbb' }}>Sélectionnez une conversation</p>
                             )}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         {/* Envoi message */}
