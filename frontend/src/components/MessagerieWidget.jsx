@@ -47,9 +47,6 @@ const MessagerieWidget = () => {
                         flexDirection: 'column'
                     }}
                 >
-                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                        <h3 style={{margin: 0}}>Messagerie</h3>
-                    </div>
                     <div style={{flex: 1, marginTop: '1rem', overflowY: 'auto'}}>
                         INTERFACE ICI
                     </div>
