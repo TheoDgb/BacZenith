@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
 function TuteurProfil() {
@@ -15,16 +16,20 @@ function TuteurProfil() {
 
     useEffect(() => {
         const fetchProfil = async () => {
-            const res = await fetch(`/api/profils/${user.id}/tuteur`);
-            const data = await res.json();
-            setProfil(data);
-            setFormData({
-                description: data.description || '',
-                disponibilites: data.disponibilites || '',
-                tarif: data.tarif || 'Service gratuit',
-                matieres: data.matieres || [],
-                is_certified: data.is_certified || false
-            });
+            try {
+                const res = await axios.get(`/api/profils/${user.id}/tuteur`);
+                const data = res.data;
+                setProfil(data);
+                setFormData({
+                    description: data.description || '',
+                    disponibilites: data.disponibilites || '',
+                    tarif: data.tarif || 'Service gratuit',
+                    matieres: data.matieres || [],
+                    is_certified: data.is_certified || false
+                });
+            } catch (err) {
+                console.error(err);
+            }
         };
         if (user.role === 'tuteur') fetchProfil();
     }, [user]);
@@ -32,23 +37,17 @@ function TuteurProfil() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await fetch(`/api/profils/${user.id}/tuteur`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            // Corriger l'affichage si tarif est vide
+            await axios.put(`/api/profils/${user.id}/tuteur`, formData);
             setFormData(prev => ({
                 ...prev,
                 tarif: prev.tarif.trim() === '' ? 'Service gratuit' : prev.tarif
             }));
-
             setMessage('Profil tuteur mis à jour avec succès.');
         } catch (err) {
             setMessage("Erreur lors de la mise à jour du profil tuteur.");
         }
     };
+
 
     return (
         <div>
