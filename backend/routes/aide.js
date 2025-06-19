@@ -75,19 +75,47 @@ router.post('/demandes/:id/prendre', auth, authorizeRoles('tuteur'), async (req,
     const tuteurId = req.user.id;
 
     try {
-        const result = await pool.query(
-            `UPDATE demandes_aide
-             SET tuteur_id = $1, en_cours = true
-             WHERE id = $2 AND (tuteur_id IS NULL OR tuteur_id = $1)
-             RETURNING *`,
-            [tuteurId, demandeId]
-        );
+        // Récupère la demande (on a besoin de l'élève et du message)
+        const { rows: demandeRows } = await pool.query(`
+            SELECT * FROM demandes_aide WHERE id = $1
+        `, [demandeId]);
 
-        if (result.rowCount === 0) {
-            return res.status(400).json({ error: "Demande déjà prise ou inexistante." });
+        if (demandeRows.length === 0) {
+            return res.status(404).json({ error: "Demande non trouvée" });
         }
 
-        res.json({ success: true, demande: result.rows[0] });
+        const demande = demandeRows[0];
+        const eleveId = demande.user_id;
+
+        // Empêcher de s'assigner une demande déjà prise par un autre
+        if (demande.tuteur_id && demande.tuteur_id !== tuteurId) {
+            return res.status(403).json({ error: "Demande déjà prise par un autre tuteur." });
+        }
+
+        // Créer la conversation (si elle n'existe pas déjà entre ces 2)
+        const conversationRes = await pool.query(`
+            INSERT INTO conversations (user1_id, user2_id)
+            VALUES ($1, $2)
+            RETURNING id
+        `, [eleveId, tuteurId]);
+
+        const conversationId = conversationRes.rows[0].id;
+
+        // Envoyer le premier message, depuis l'élève
+        await pool.query(`
+            INSERT INTO messages (conversation_id, sender_id, content)
+            VALUES ($1, $2, $3)
+        `, [conversationId, eleveId, demande.message]);
+
+        // Mettre à jour la demande
+        const update = await pool.query(`
+            UPDATE demandes_aide
+            SET tuteur_id = $1, en_cours = true, conversation_id = $2
+            WHERE id = $3
+            RETURNING *
+        `, [tuteurId, conversationId, demandeId]);
+
+        res.json({ success: true, demande: update.rows[0] });
     } catch (err) {
         console.error('Erreur lors de l’assignation de la demande :', err);
         res.status(500).json({ error: 'Erreur serveur' });
