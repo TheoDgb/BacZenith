@@ -85,6 +85,10 @@ router.post('/conversations/:id/messages', auth, async (req, res) => {
             RETURNING *
         `, [conversationId, senderId, content]);
 
+        const io = req.app.get('io');
+        // Emettre l'événement à tous les membres de la conversation
+        io.to(`conversation_${conversationId}`).emit('new_message', rows[0]);
+
         res.status(201).json(rows[0]);
     } catch (err) {
         console.error(err);

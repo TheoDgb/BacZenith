@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
+import io from 'socket.io-client';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
@@ -9,6 +10,57 @@ const MessagerieWidget = () => {
     const [messages, setMessages] = useState([]);
     const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
+
+    const socketRef = useRef(null);
+    useEffect(() => {
+        // Création socket à la montée du composant
+        const socketUrl = import.meta.env.VITE_SOCKET_URL;
+        socketRef.current = io(socketUrl);
+
+        // Nettoyage à la descente
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!socketRef.current) return;
+
+        // Fonction pour gérer les nouveaux messages reçus
+        const handleNewMessage = (message) => {
+            setMessages((prev) => {
+                const exists = prev.some((m) => m.id === message.id);
+                if (exists) return prev;
+                return [...prev, message];
+            });
+        };
+
+        if (selectedConversationId) {
+            socketRef.current.emit('join_conversation', selectedConversationId);
+
+            // Empêche les doublons de listeners
+            socketRef.current.off('new_message');
+            socketRef.current.on('new_message', handleNewMessage);
+        }
+
+        return () => {
+            if (selectedConversationId) {
+                socketRef.current.emit('leave_conversation', selectedConversationId);
+                socketRef.current.off('new_message');
+            }
+        };
+    }, [selectedConversationId]);
+
+    // Pour debug éventuels doublons
+    useEffect(() => {
+        const counts = {};
+        messages.forEach(m => {
+            counts[m.id] = (counts[m.id] || 0) + 1;
+        });
+        console.log('Doublons éventuels :', counts);
+    }, [messages]);
+
+
 
     useEffect(() => {
         if (isOpen) {
@@ -44,7 +96,12 @@ const MessagerieWidget = () => {
                     content: newMessage
                 });
 
-            setMessages((prev) => [...prev, res.data]);
+            setMessages((prev) => {
+                const exists = prev.some((m) => m.id === res.data.id);
+                if (exists) return prev;
+                return [...prev, res.data];
+            });
+
             setNewMessage('');
         } catch (err) {
             console.error('Erreur envoi message:', err);

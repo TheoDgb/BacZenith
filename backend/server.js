@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config');
+const http = require('http');
+const { Server } = require('socket.io');
 const candidaturesRoutes = require('./routes/candidatures');
 const authRoutes = require('./routes/auth');
 const profilsRoutes = require('./routes/profils');
@@ -13,6 +15,22 @@ const sendMail = require('./utils/sendMail');
 const app = express();
 const PORT = 5000;
 
+
+
+// Créer serveur HTTP avec Express (nécessaire pour socket.io)
+const server = http.createServer(app);
+// Initialiser Socket.IO avec options CORS
+const io = new Server(server, {
+    cors: {
+        origin: '*', // adapte l'origine front si besoin
+        methods: ['GET', 'POST']
+    }
+});
+// Rendre io accessible dans les routes via app.set
+app.set('io', io);
+
+
+
 // Middleware
 app.use(cors()); // autorise les requêtes depuis le frontend
 app.use(express.json());
@@ -24,6 +42,26 @@ app.use('/api/profils', profilsRoutes);
 app.use('/api/sujets', sujetsRoutes);
 app.use('/api/aide', aideRoutes);
 app.use('/api/messages', messagesRoutes);
+
+
+
+// Socket.IO gestion connexion
+io.on('connection', (socket) => {
+    console.log('Nouvelle connexion socket:', socket.id);
+    socket.on('join_conversation', (conversationId) => {
+        socket.join(`conversation_${conversationId}`);
+        console.log(`Socket ${socket.id} a rejoint conversation_${conversationId}`);
+    });
+    socket.on('disconnect', () => {
+        console.log('Socket déconnecté:', socket.id);
+    });
+    socket.on('leave_conversation', (conversationId) => {
+        socket.leave(`conversation_${conversationId}`);
+        console.log(`Socket ${socket.id} a quitté conversation_${conversationId}`);
+    });
+});
+
+
 
 // Test de serveur
 app.get('/', (req, res) => {
@@ -55,6 +93,6 @@ app.post('/test-mail', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+    server.listen(PORT, () => {
     console.log(`Serveur backend lancé sur http://localhost:${PORT}`);
 });
