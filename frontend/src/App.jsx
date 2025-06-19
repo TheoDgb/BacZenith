@@ -1,3 +1,5 @@
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Link, Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './context/AuthContext.jsx';
@@ -12,7 +14,7 @@ import AdminAccueil from './pages/AdminAccueil.jsx';
 import AdminSujets from './pages/AdminSujets.jsx';
 import AdminCandidatures from './pages/AdminCandidatures.jsx';
 import Profil from "./pages/Profil.jsx";
-
+import MessagerieWidget from './components/MessagerieWidget';
 
 function PrivateRoute({ children, allowedRoles }) {
     const { user, loading } = useContext(AuthContext);
@@ -127,6 +129,14 @@ function App() {
                     }
                 />
             </Routes>
+
+            <div className="App">
+                {/* ...tout ton JSX existant... */}
+                <Routes>{/* routes ici */}</Routes>
+
+                {/* 👇 Ajouter ici la messagerie visible uniquement si connecté */}
+                <MessagerieWidget />
+            </div>
         </div>
     );
 }

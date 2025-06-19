@@ -1,37 +1,72 @@
-import { useState, useContext } from 'react';
-import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext'; // adapte le chemin si besoin
 
-function ChangeEmailForm() {
+const MessagerieWidget = () => {
     const { user } = useContext(AuthContext);
-    const [form, setForm] = useState({ oldEmail: '', newEmail: '' });
-    const [message, setMessage] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
 
-    const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-
-    const handleSubmit = async e => {
-        e.preventDefault();
-        try {
-            const res = await axios.put(`/api/profils/${user.id}/email`, form);
-            setMessage('Email mis à jour');
-            setForm({ oldEmail: '', newEmail: '' });
-        } catch (err) {
-            setMessage(err.response?.data?.error || 'Erreur lors de la mise à jour');
-        }
-    };
+    // Si non connecté → ne pas afficher le bouton
+    if (!user) return null;
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>Ancienne adresse</label><br />
-            <input type="email" name="oldEmail" value={form.oldEmail} onChange={handleChange} className="form-control" required /><br /><br />
-            <label>Nouvelle adresse</label><br />
-            <input type="email" name="newEmail" value={form.newEmail} onChange={handleChange} className="form-control" required /><br /><br />
-            <div className="form-container">
-                <button type="submit">Modifier</button>
-                {message && <p>{message}</p>}
-            </div>
-        </form>
-    );
-}
+        <>
+            {/* Bouton flottant */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                style={{
+                    position: 'fixed',
+                    bottom: '1rem',
+                    right: '1rem',
+                    zIndex: 1000,
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    padding: '0.75rem 1.25rem',
+                    borderRadius: '999px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 10px rgba(0,0,0,0.2)'
+                }}
+            >
+                Messagerie
+            </button>
 
-export default ChangeEmailForm;
+            {/* Fenêtre popup */}
+            {isOpen && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        bottom: '5rem',
+                        right: '1rem',
+                        width: '50vw',
+                        height: '50vh',
+                        backgroundColor: 'white',
+                        borderRadius: '1rem',
+                        boxShadow: '0 0 20px rgba(0,0,0,0.3)',
+                        padding: '1rem',
+                        zIndex: 1000,
+                        overflow: 'auto',
+                    }}
+                >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3>Messagerie</h3>
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                fontSize: '1.25rem',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            ✖
+                        </button>
+                    </div>
+
+                    <p>Ici apparaîtra la messagerie en temps réel.</p>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default MessagerieWidget;
