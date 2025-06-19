@@ -11,7 +11,8 @@ function TuteurProfil() {
         disponibilites: '',
         tarif: 'Service gratuit',
         matieres: [],
-        is_certified: false
+        is_certified: false,
+        visible: true
     });
 
     useEffect(() => {
@@ -25,7 +26,8 @@ function TuteurProfil() {
                     disponibilites: data.disponibilites || '',
                     tarif: data.tarif || 'Service gratuit',
                     matieres: data.matieres || [],
-                    is_certified: data.is_certified || false
+                    is_certified: data.is_certified || false,
+                    visible: data.visible || true
                 });
             } catch (err) {
                 console.error(err);
@@ -54,6 +56,18 @@ function TuteurProfil() {
             <hr />
             <h3>Informations du profil tuteur public</h3>
             <form onSubmit={handleSubmit}>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={formData.visible}
+                        onChange={e => setFormData({ ...formData, visible: e.target.checked })}
+                    />
+                    Rendre mon profil visible dans les demandes d’aides
+                </label>
+                <p style={{ color: 'gray', fontStyle: 'italic' }}>
+                    Décocher (masquer votre profil) peut s'avérer utile si vous êtes surchargé de demandes d'aide.
+                </p>
+                <br />
                 <label>Matières liées à votre profil tuteur :</label>
                 <ul>
                     {formData.matieres.map((matiere, index) => (

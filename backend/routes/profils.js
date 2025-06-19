@@ -112,7 +112,7 @@ router.get('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershi
 // Mettre à jour le profil tuteur
 router.put('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershipOrAdmin, async (req, res) => {
     const { id } = req.params;
-    const { description, disponibilites, tarif } = req.body;
+    const { description, disponibilites, tarif, visible } = req.body;
 
     const client = await pool.connect();
     try {
@@ -136,9 +136,10 @@ router.put('/:id/tuteur', auth, authorizeRoles('tuteur', 'admin'), checkOwnershi
              SET description = $1,
                  disponibilites = $2,
                  tarif = $3,
+                 visible = $4,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE user_id = $4`,
-            [description, disponibilites, tarifFinal, id]
+             WHERE user_id = $5`,
+            [description, disponibilites, tarifFinal, visible, id]
         );
 
         await client.query('COMMIT');
