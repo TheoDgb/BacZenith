@@ -164,7 +164,8 @@ router.get('/tuteurs', auth, authorizeRoles('eleve', 'admin'), async (req, res) 
             JOIN tuteur_profils tp ON tp.user_id = u.id
             JOIN tuteur_matieres tm ON tm.tuteur_id = u.id
             WHERE LOWER(CONCAT(u.nom, ' ', u.prenom)) LIKE $1
-              AND tm.matiere = $2
+                AND tm.matiere = $2
+                AND tp.visible = true
         `;
 
         const countRes = await pool.query(

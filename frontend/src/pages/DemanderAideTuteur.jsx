@@ -311,7 +311,6 @@ export default function DemanderAideTuteur() {
                         {contactType === 'specifique' && (
                             <div style={{ marginTop: '0.5rem' }}>
                                 <h3>Tuteurs disponibles pour : {matiereSelectionnee}</h3>
-
                                 <input
                                     type="text"
                                     placeholder="Nom / Prénom"
@@ -323,50 +322,54 @@ export default function DemanderAideTuteur() {
                                     className="form-control"
                                 />
                                 <hr />
-                                <ul>
-                                    {tuteurs.map((tuteur) => (
-                                        <li key={tuteur.id} style={{ marginBottom: '1rem' }}>
-                                            <strong>{tuteur.nom} {tuteur.prenom}</strong><br />
-                                            {tuteur.description}<br />
-                                            Tarif : {tuteur.tarif}<br />
-                                            Disponibilités : {tuteur.disponibilites || 'Non renseignées'}
-                                            <br />
+                                {tuteurs.length === 0 ? (
+                                    <p>Aucun tuteur visible trouvé pour cette recherche. Vous pouvez toujours essayer de laisser un tuteur vous contacter.</p>
+                                ) : (
+                                    <>
+                                        <ul>
+                                            {tuteurs.map((tuteur) => (
+                                                <li key={tuteur.id} style={{ marginBottom: '1rem' }}>
+                                                    <strong>{tuteur.nom} {tuteur.prenom}</strong><br />
+                                                    {tuteur.description}<br />
+                                                    Tarif : {tuteur.tarif}<br />
+                                                    Disponibilités : {tuteur.disponibilites || 'Non renseignées'}
+                                                    <br />
+                                                    <button
+                                                        onClick={() => setTuteurSelectionneId(tuteur.id)}
+                                                        style={{
+                                                            marginTop: '0.5rem',
+                                                            backgroundColor: tuteurSelectionneId === tuteur.id ? 'green' : '#eee',
+                                                            color: tuteurSelectionneId === tuteur.id ? 'white' : 'black',
+                                                            border: '1px solid #ccc',
+                                                            padding: '0.5rem 1rem',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        {tuteurSelectionneId === tuteur.id ? 'Tuteur sélectionné' : 'Sélectionner ce tuteur'}
+                                                    </button>
+                                                    <hr />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div>
                                             <button
-                                                onClick={() => setTuteurSelectionneId(tuteur.id)}
-                                                style={{
-                                                    marginTop: '0.5rem',
-                                                    backgroundColor: tuteurSelectionneId === tuteur.id ? 'green' : '#eee',
-                                                    color: tuteurSelectionneId === tuteur.id ? 'white' : 'black',
-                                                    border: '1px solid #ccc',
-                                                    padding: '0.5rem 1rem',
-                                                    cursor: 'pointer'
-                                                }}
+                                                onClick={() => setPageTuteur((p) => Math.max(p - 1, 1))}
+                                                disabled={pageTuteur === 1}
                                             >
-                                                {tuteurSelectionneId === tuteur.id ? 'Tuteur sélectionné' : 'Sélectionner ce tuteur'}
+                                                Précédent
                                             </button>
-                                            <hr />
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <div>
-                                    <button
-                                        onClick={() => setPageTuteur((p) => Math.max(p - 1, 1))}
-                                        disabled={pageTuteur === 1}
-                                    >
-                                        Précédent
-                                    </button>
-
-                                    <span style={{ margin: '0 1rem' }}>
-                                        Page {pageTuteur} / {Math.ceil(totalTuteurs / 5)}
-                                    </span>
-                                    <button
-                                        onClick={() => setPageTuteur((p) => (p < Math.ceil(totalTuteurs / 5) ? p + 1 : p))}
-                                        disabled={pageTuteur >= Math.ceil(totalTuteurs / 5)}
-                                    >
-                                        Suivant
-                                    </button>
-                                </div>
+                                            <span style={{ margin: '0 1rem' }}>
+                                                Page {pageTuteur} / {Math.ceil(totalTuteurs / 5)}
+                                            </span>
+                                            <button
+                                                onClick={() => setPageTuteur((p) => (p < Math.ceil(totalTuteurs / 5) ? p + 1 : p))}
+                                                disabled={pageTuteur >= Math.ceil(totalTuteurs / 5)}
+                                            >
+                                                Suivant
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         )}
                         <hr />
