@@ -130,13 +130,7 @@ function App() {
                 />
             </Routes>
 
-            <div className="App">
-                {/* ...tout ton JSX existant... */}
-                <Routes>{/* routes ici */}</Routes>
-
-                {/* 👇 Ajouter ici la messagerie visible uniquement si connecté */}
-                <MessagerieWidget />
-            </div>
+            <MessagerieWidget />
         </div>
     );
 }

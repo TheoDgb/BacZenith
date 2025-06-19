@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const profilsRoutes = require('./routes/profils');
 const sujetsRoutes = require('./routes/sujets');
 const aideRoutes = require('./routes/aide');
+const messagesRoutes = require('./routes/messages');
 require('dotenv').config();
 const sendMail = require('./utils/sendMail');
 
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profils', profilsRoutes);
 app.use('/api/sujets', sujetsRoutes);
 app.use('/api/aide', aideRoutes);
+app.use('/api/messages', messagesRoutes);
 
 // Test de serveur
 app.get('/', (req, res) => {
