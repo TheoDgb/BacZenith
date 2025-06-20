@@ -29,45 +29,59 @@ const MessagerieWidget = () => {
 
         // Fonction pour gérer les nouveaux messages reçus
         const handleNewMessage = (message) => {
-            setMessages((prev) => {
-                const exists = prev.some((m) => m.id === message.id);
-                if (exists) return prev;
-                return [...prev, message];
-            });
+            // Si la conversation est ouverte : ajouter le message
+            if (message.conversation_id === selectedConversationId) {
+                setMessages((prev) => {
+                    const exists = prev.some((m) => m.id === message.id);
+                    if (exists) return prev;
+                    return [...prev, message];
+                });
+            } else {
+                // Sinon rafraîchir la liste des conversations (mettra à jour unread_count)
+                fetchConversations();
+            }
         };
 
-        if (selectedConversationId) {
-            socketRef.current.emit('join_conversation', selectedConversationId);
-
-            // Empêche les doublons de listeners
-            socketRef.current.off('new_message');
-            socketRef.current.on('new_message', handleNewMessage);
-        }
+        socketRef.current.on('new_message', handleNewMessage);
 
         return () => {
-            if (selectedConversationId) {
-                socketRef.current.emit('leave_conversation', selectedConversationId);
-                socketRef.current.off('new_message');
-            }
+            socketRef.current.off('new_message', handleNewMessage);
         };
     }, [selectedConversationId]);
 
-    // Pour debug éventuels doublons
     useEffect(() => {
-        const counts = {};
-        messages.forEach(m => {
-            counts[m.id] = (counts[m.id] || 0) + 1;
-        });
-        console.log('Doublons éventuels :', counts);
-    }, [messages]);
-
-
+        if (socketRef.current && user) {
+            socketRef.current.emit('join_user', user.id);
+        }
+    }, [user]);
 
     useEffect(() => {
         if (isOpen) {
             fetchConversations();
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen && messages.length > 0 && messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen && selectedConversationId && messages.length > 0) {
+            // On suppose que l'utilisateur voit tous les messages dès qu'il ouvre la conversation
+            markMessagesAsRead(selectedConversationId);
+        }
+    }, [isOpen, selectedConversationId, messages]);
+
+    const markMessagesAsRead = async (conversationId) => {
+        try {
+            await axios.post(`/api/messages/conversations/${conversationId}/mark_read`);
+            fetchConversations(); // pour mettre à jour l'indicateur
+        } catch (err) {
+            console.error('Erreur mise à jour lecture messages:', err);
+        }
+    };
 
     const fetchConversations = async () => {
         try {
@@ -159,8 +173,8 @@ const MessagerieWidget = () => {
                     <div style={{ width: '40%', borderRight: '1px solid #444', overflowY: 'auto' }}>
                         {conversations.map((conv) => {
                             const otherUser = conv.user1_id === user.id
-                                ? conv.user2_nom
-                                : conv.user1_nom;
+                                ? `${conv.user2_prenom} ${conv.user2_nom}`
+                                : `${conv.user1_prenom} ${conv.user1_nom}`;
 
                             return (
                                 <div
@@ -171,10 +185,30 @@ const MessagerieWidget = () => {
                                         cursor: 'pointer',
                                         backgroundColor: conv.id === selectedConversationId ? '#444' : 'transparent',
                                         borderBottom: '1px solid #555',
-                                        color: 'white'
+                                        color: 'white',
+                                        fontWeight: conv.unread_count > 0 ? 'bold' : 'normal',
+                                        position: 'relative'
                                     }}
                                 >
                                     {otherUser}
+                                    {conv.unread_count > 0 && (
+                                        <span style={{
+                                            position: 'absolute',
+                                            top: '10px',
+                                            right: '10px',
+                                            backgroundColor: 'red',
+                                            borderRadius: '50%',
+                                            width: '18px',
+                                            height: '18px',
+                                            color: 'white',
+                                            fontSize: '0.75rem',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}>
+                                            {conv.unread_count}
+                                        </span>
+                                    )}
                                 </div>
                             );
                         })}

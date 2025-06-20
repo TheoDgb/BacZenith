@@ -15,8 +15,6 @@ const sendMail = require('./utils/sendMail');
 const app = express();
 const PORT = 5000;
 
-
-
 // Créer serveur HTTP avec Express (nécessaire pour socket.io)
 const server = http.createServer(app);
 // Initialiser Socket.IO avec options CORS
@@ -28,8 +26,6 @@ const io = new Server(server, {
 });
 // Rendre io accessible dans les routes via app.set
 app.set('io', io);
-
-
 
 // Middleware
 app.use(cors()); // autorise les requêtes depuis le frontend
@@ -43,25 +39,24 @@ app.use('/api/sujets', sujetsRoutes);
 app.use('/api/aide', aideRoutes);
 app.use('/api/messages', messagesRoutes);
 
-
-
 // Socket.IO gestion connexion
 io.on('connection', (socket) => {
-    console.log('Nouvelle connexion socket:', socket.id);
     socket.on('join_conversation', (conversationId) => {
         socket.join(`conversation_${conversationId}`);
         console.log(`Socket ${socket.id} a rejoint conversation_${conversationId}`);
-    });
-    socket.on('disconnect', () => {
-        console.log('Socket déconnecté:', socket.id);
     });
     socket.on('leave_conversation', (conversationId) => {
         socket.leave(`conversation_${conversationId}`);
         console.log(`Socket ${socket.id} a quitté conversation_${conversationId}`);
     });
+    socket.on('join_user', (userId) => {
+        socket.join(`user_${userId}`);
+        console.log(`Socket ${socket.id} a rejoint user_${userId}`);
+    });
+    socket.on('disconnect', () => {
+        console.log('Socket déconnecté:', socket.id);
+    });
 });
-
-
 
 // Test de serveur
 app.get('/', (req, res) => {

@@ -10,7 +10,17 @@ router.get('/conversations', auth, async (req, res) => {
 
     try {
         const { rows } = await pool.query(`
-            SELECT c.id, u1.id AS user1_id, u1.nom AS user1_nom, u2.id AS user2_id, u2.nom AS user2_nom
+            SELECT c.id,
+                u1.id AS user1_id, u1.nom AS user1_nom, u1.prenom AS user1_prenom,
+                u2.id AS user2_id, u2.nom AS user2_nom, u2.prenom AS user2_prenom,
+                (
+                    SELECT COUNT(*) FROM messages m
+                    WHERE m.conversation_id = c.id
+                        AND m.sender_id <> $1
+                        AND m.id NOT IN (
+                            SELECT message_id FROM message_reads WHERE user_id = $1
+                        )
+                ) AS unread_count
             FROM conversations c
             JOIN users u1 ON u1.id = c.user1_id
             JOIN users u2 ON u2.id = c.user2_id
@@ -22,6 +32,29 @@ router.get('/conversations', auth, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Erreur lors de la récupération des conversations");
+    }
+});
+
+// POST /api/messages/conversations/:id/mark_read
+router.post('/conversations/:conversationId/mark_read', auth, async (req, res) => {
+    const userId = req.user.id;
+    const conversationId = req.params.conversationId;
+
+    try {
+        await pool.query(`
+          INSERT INTO message_reads (message_id, user_id)
+          SELECT id, $1 FROM messages
+          WHERE conversation_id = $2
+            AND id NOT IN (
+              SELECT message_id FROM message_reads WHERE user_id = $1
+            )
+            AND sender_id <> $1
+        `, [userId, conversationId]);
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur lors de la mise à jour des messages lus" });
     }
 });
 
@@ -86,8 +119,16 @@ router.post('/conversations/:id/messages', auth, async (req, res) => {
         `, [conversationId, senderId, content]);
 
         const io = req.app.get('io');
-        // Emettre l'événement à tous les membres de la conversation
+
+        // Obtenir les IDs des deux participants
+        const conv = validConv.rows[0];
+        const recipientId = (senderId === conv.user1_id) ? conv.user2_id : conv.user1_id;
+
+        // Émettre vers la room de la conversation (si elle est ouverte activement)
         io.to(`conversation_${conversationId}`).emit('new_message', rows[0]);
+
+        // Émettre vers la room de l'utilisateur (notification globale)
+        io.to(`user_${recipientId}`).emit('new_message', rows[0]);
 
         res.status(201).json(rows[0]);
     } catch (err) {
