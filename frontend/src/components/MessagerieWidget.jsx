@@ -2,12 +2,14 @@ import io from 'socket.io-client';
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const MessagerieWidget = () => {
     const { user } = useContext(AuthContext);
     const [isOpen, setIsOpen] = useState(false);
     const [conversations, setConversations] = useState([]);
     const [messages, setMessages] = useState([]);
+    const [sujet, setSujet] = useState(null);
     const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef(null);
@@ -95,7 +97,8 @@ const MessagerieWidget = () => {
     const fetchMessages = async (conversationId) => {
         try {
             const res = await axios.get(`/api/messages/conversations/${conversationId}/messages`);
-            setMessages(res.data);
+            setMessages(res.data.messages);
+            setSujet(res.data.sujet);
             setSelectedConversationId(conversationId);
         } catch (err) {
             console.error('Erreur récupération messages:', err);
@@ -216,6 +219,16 @@ const MessagerieWidget = () => {
 
                     {/* Colonne messages */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        {/* Sujet lié ou autre */}
+                        <div style={{ padding: '1rem 1rem', color: '#ddd', backgroundColor: '#222', borderBottom: '1px solid #444' }}>
+                            {sujet ? (
+                                <Link to={`/sujets/${sujet.id}`} style={{ color: '#4ea1f7', textDecoration: 'underline' }}>
+                                    Sujet concerné
+                                </Link>
+                            ) : (
+                                <span>Sujet autre</span>
+                            )}
+                        </div>
                         <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', color: 'white' }}>
                             {selectedConversationId ? (
                                 messages.map((msg) => (

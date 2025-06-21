@@ -78,7 +78,7 @@ router.get('/conversations/:id/messages', auth, async (req, res) => {
         }
 
         // Récupérer les messages
-        const { rows } = await pool.query(`
+        const { rows: messages } = await pool.query(`
             SELECT m.*, u.nom, u.prenom
             FROM messages m
             JOIN users u ON u.id = m.sender_id
@@ -86,7 +86,19 @@ router.get('/conversations/:id/messages', auth, async (req, res) => {
             ORDER BY m.sent_at ASC
         `, [conversationId]);
 
-        res.json(rows);
+        // Récupérer le sujet lié s'il existe
+        const { rows: sujetRows } = await pool.query(`
+            SELECT s.id, s.annee, s.serie, s.matiere, s.specialite, s.epreuve, s.session, s.num_sujet
+            FROM demandes_aide da
+            JOIN sujets s ON da.sujet_id = s.id
+            WHERE da.conversation_id = $1
+            LIMIT 1
+        `, [conversationId]);
+
+        res.json({
+            messages,
+            sujet: sujetRows[0] || null
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send("Erreur lors de la récupération des messages");

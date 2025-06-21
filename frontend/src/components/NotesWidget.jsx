@@ -80,7 +80,7 @@ const NotesWidget = ({ sujetId, demandeId }) => {
                         position: 'fixed',
                         top: '1.5rem',
                         right: '1.5rem',
-                        width: '40vw',
+                        width: '45vw',
                         height: '40vh',
                         backgroundColor: '#323232',
                         borderRadius: '1rem',
