@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../config');
 const { auth, authorizeRoles } = require('../middlewares/auth');
 
+// VERIFIER USERS
+
 // GET /api/messages/conversations
 // Récupérer toutes les conversations de l’utilisateur connecté
 router.get('/conversations', auth, async (req, res) => {

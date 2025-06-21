@@ -1,14 +1,17 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import NotesWidget from '../components/NotesWidget';
+import { AuthContext } from '../context/AuthContext';
 
 function SujetDetail() {
     const { id } = useParams();
     const [sujet, setSujet] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/sujets/${id}`)
+        axios.get(`/api/sujets/${id}`)
             .then(res => {
                 setSujet(res.data);
                 setLoading(false);
@@ -76,6 +79,10 @@ function SujetDetail() {
                 </>
             ) : (
                 <p>Aucun corrigé disponible pour ce sujet.</p>
+            )}
+
+            {user?.role === 'eleve' && (
+                <NotesWidget sujetId={id} />
             )}
         </div>
     );

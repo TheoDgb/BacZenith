@@ -21,7 +21,7 @@ const MessagerieWidget = () => {
         // Nettoyage à la descente
         return () => {
             socketRef.current.disconnect();
-        };
+        }
     }, []);
 
     useEffect(() => {
@@ -40,13 +40,13 @@ const MessagerieWidget = () => {
                 // Sinon rafraîchir la liste des conversations (mettra à jour unread_count)
                 fetchConversations();
             }
-        };
+        }
 
         socketRef.current.on('new_message', handleNewMessage);
 
         return () => {
             socketRef.current.off('new_message', handleNewMessage);
-        };
+        }
     }, [selectedConversationId]);
 
     useEffect(() => {
@@ -81,7 +81,7 @@ const MessagerieWidget = () => {
         } catch (err) {
             console.error('Erreur mise à jour lecture messages:', err);
         }
-    };
+    }
 
     const fetchConversations = async () => {
         try {
@@ -90,7 +90,7 @@ const MessagerieWidget = () => {
         } catch (err) {
             console.error('Erreur récupération conversations:', err);
         }
-    };
+    }
 
     const fetchMessages = async (conversationId) => {
         try {
@@ -100,7 +100,7 @@ const MessagerieWidget = () => {
         } catch (err) {
             console.error('Erreur récupération messages:', err);
         }
-    };
+    }
 
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
@@ -121,7 +121,7 @@ const MessagerieWidget = () => {
         } catch (err) {
             console.error('Erreur envoi message:', err);
         }
-    };
+    }
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -150,7 +150,7 @@ const MessagerieWidget = () => {
                     cursor: 'pointer'
                 }}
             >
-                {isOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-send"></i>}
+                {isOpen ? <i className="bi bi-x-lg"></i> : 'Messagerie'}
             </button>
 
             {isOpen && (
@@ -264,6 +264,6 @@ const MessagerieWidget = () => {
             )}
         </>
     );
-};
+}
 
 export default MessagerieWidget;

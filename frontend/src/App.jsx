@@ -15,6 +15,7 @@ import AdminSujets from './pages/AdminSujets.jsx';
 import AdminCandidatures from './pages/AdminCandidatures.jsx';
 import Profil from "./pages/Profil.jsx";
 import MessagerieWidget from './components/MessagerieWidget';
+// import NotesWidget from './components/NotesWidget';
 
 function PrivateRoute({ children, allowedRoles }) {
     const { user, loading } = useContext(AuthContext);
@@ -129,7 +130,7 @@ function App() {
                     }
                 />
             </Routes>
-
+            {/*<NotesWidget />*/}
             <MessagerieWidget />
         </div>
     );
