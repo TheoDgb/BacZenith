@@ -2,6 +2,9 @@
 
 **Bac Zénith** est une plateforme web destinée aux élèves préparant le baccalauréat. Elle centralise une recherche rapide de sujets d’examen, un système de prise de notes, une gestion des sujets et des tuteurs, et la possibilité pour un élève de demander de l'aide à un des tuteurs qualifiés pour y répondre à travers une messagerie intégrée.
 
+Pour en savoir plus sur le contexte et les raisons de ce projet, [consultez la présentation de la soutenance Bac Zénith](https://github.com/TheoDgb/BacZenith/blob/main/docs/Open%20Innovation%20BAC%20Z%C3%89NITH.pdf).
+<br> Vous pouvez également retrouver des captures d'écran du site web (prototype) [ici](https://github.com/TheoDgb/BacZenith/tree/main/docs/screens).
+
 Ce projet a été réalisé dans le cadre d’un projet Open Innovation sur deux ans à l’école EPSI, avec pour objectif de présenter un prototype à des investisseurs à la fin de la première année ainsi que de proposer un projet complet et terminé à la fin de la deuxième année.
 
 Note : Ce projet restera à l’état de prototype. Bien qu’il ait reçu un retour très positif du jury lors de la première soutenance, il ne sera pas poursuivi en deuxième année.
