@@ -93,6 +93,7 @@ Dans `backend/`, créez un fichier `.env` en vous servant de `.env.example`.
 
 ### Lancer le projet en développement
 Ouvrir deux terminaux :
+
 Terminal 1 - Lancer le frontend :
 ```
 cd frontend
