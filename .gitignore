@@ -3,9 +3,9 @@
 /backend/.env
 /backend/node_modules/
 
-/frontend/.env
 /frontend/node_modules/
 
-/db.sql
 /info.txt
-/backend/createAdmin.js
+
+/docs/liens
+/docs/CAHIER DES CHARGES - BAC ZÉNITH.pdf

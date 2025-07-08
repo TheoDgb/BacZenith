@@ -132,6 +132,21 @@ const MessagerieWidget = () => {
         }
     }, [messages]);
 
+    // test
+    const handleNoteButtonClick = () => {
+        if (!user) return;
+
+        if (user.role === 'tuteur') {
+            // Redirection ou ouverture d’un modal pour voir les notes des élèves
+            window.location.href = '/notes/tuteur';
+        } else if (user.role === 'eleve') {
+            // Redirection ou ouverture d’un formulaire d’envoi de notes
+            window.location.href = '/notes/eleve';
+        } else {
+            alert("Rôle inconnu ou non autorisé.");
+        }
+    };
+
     if (!user) return null; // Ne rien afficher si non connecté
 
     return (
@@ -174,47 +189,70 @@ const MessagerieWidget = () => {
                 >
                     {/* Colonne conversations */}
                     <div style={{ width: '40%', borderRight: '1px solid #444', overflowY: 'auto' }}>
-                        {conversations.map((conv) => {
-                            const otherUser = conv.user1_id === user.id
-                                ? `${conv.user2_prenom} ${conv.user2_nom}`
-                                : `${conv.user1_prenom} ${conv.user1_nom}`;
+                        <div style={{ flex: 1, overflowY: 'auto' }}>
+                            {conversations.map((conv) => {
+                                const otherUser = conv.user1_id === user.id
+                                    ? `${conv.user2_prenom} ${conv.user2_nom}`
+                                    : `${conv.user1_prenom} ${conv.user1_nom}`;
 
-                            return (
-                                <div
-                                    key={conv.id}
-                                    onClick={() => fetchMessages(conv.id)}
+                                return (
+                                    <div
+                                        key={conv.id}
+                                        onClick={() => fetchMessages(conv.id)}
+                                        style={{
+                                            padding: '1rem',
+                                            cursor: 'pointer',
+                                            backgroundColor: conv.id === selectedConversationId ? '#444' : 'transparent',
+                                            borderBottom: '1px solid #555',
+                                            color: 'white',
+                                            fontWeight: conv.unread_count > 0 ? 'bold' : 'normal',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        {otherUser}
+                                        {conv.unread_count > 0 && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: '10px',
+                                                right: '10px',
+                                                backgroundColor: 'red',
+                                                borderRadius: '50%',
+                                                width: '18px',
+                                                height: '18px',
+                                                color: 'white',
+                                                fontSize: '0.75rem',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }}>
+                                                {conv.unread_count}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Partage des notes */}
+                        <div style={{ padding: '1rem', color: '#ddd', backgroundColor: '#222', borderTop: '1px solid #444' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                {/*<span>Partage des notes</span>*/}
+                                <button
+                                    onClick={handleNoteButtonClick}
                                     style={{
-                                        padding: '1rem',
-                                        cursor: 'pointer',
-                                        backgroundColor: conv.id === selectedConversationId ? '#444' : 'transparent',
-                                        borderBottom: '1px solid #555',
+                                        padding: '0.25rem 0.5rem',
+                                        fontSize: '0.85rem',
+                                        backgroundColor: '#4ea1f7',
                                         color: 'white',
-                                        fontWeight: conv.unread_count > 0 ? 'bold' : 'normal',
-                                        position: 'relative'
+                                        border: 'none',
+                                        borderRadius: '0.5rem',
+                                        cursor: 'pointer'
                                     }}
                                 >
-                                    {otherUser}
-                                    {conv.unread_count > 0 && (
-                                        <span style={{
-                                            position: 'absolute',
-                                            top: '10px',
-                                            right: '10px',
-                                            backgroundColor: 'red',
-                                            borderRadius: '50%',
-                                            width: '18px',
-                                            height: '18px',
-                                            color: 'white',
-                                            fontSize: '0.75rem',
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }}>
-                                            {conv.unread_count}
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                    {user.role === 'tuteur' ? 'Demander le partage des notes' : 'Partager mes notes'}
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Colonne messages */}

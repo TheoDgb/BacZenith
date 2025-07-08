@@ -58,8 +58,9 @@ const NotesWidget = ({ sujetId, demandeId }) => {
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
                     position: 'fixed',
-                    top: '1.5rem',
+                    top: '50%',
                     right: '1.5rem',
+                    transform: 'translateY(-50%)',
                     zIndex: 999,
                     backgroundColor: '#28a745',
                     color: 'white',
