@@ -1,6 +1,6 @@
 # Bac Zénith
 
-**Bac Zénith** est une plateforme web destinée aux élèves préparant le baccalauréat. Elle centralise une recherche rapide de sujets d’examen, un système de prise de notes, une gestion des sujets et des tuteurs, et la possibilité pour un élève de demander de l'aide à un des tuteurs qualifiés pour y répondre à travers une messagerie intégrée.
+**Bac Zénith** est une plateforme web, destinée aux élèves préparant le baccalauréat, incluant un accompagnement humain. Elle centralise une recherche rapide de sujets d’examen, un système de prise de notes, une gestion des sujets et des tuteurs, et la possibilité pour un élève de demander de l'aide à un des tuteurs qualifiés pour y répondre à travers une messagerie intégrée.
 
 Pour en savoir plus sur le contexte et les raisons de ce projet, [consultez la présentation de la soutenance Bac Zénith](https://github.com/TheoDgb/BacZenith/blob/main/docs/Open%20Innovation%20BAC%20Z%C3%89NITH.pdf).
 <br> Vous pouvez également retrouver des captures d'écran du site web (prototype) [ici](https://github.com/TheoDgb/BacZenith/tree/main/docs/screens).
